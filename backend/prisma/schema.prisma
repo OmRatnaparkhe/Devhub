@@ -1,0 +1,103 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String?    @unique
+  name         String
+  username     String    @unique
+  role String
+  profilePic   String?
+  githubLink String @unique
+  description  String?
+  contactLinks Json?
+  onboarded Boolean @default(false)
+  createdAt    DateTime  @default(now())
+  publishedAt  DateTime  @updatedAt
+  blogs        Blog[]
+  comments     Comment[]
+  followers    Follows[] @relation("followers")
+  following    Follows[] @relation("following")
+  likes        Like[]
+  posts        Post[]
+  projects     Project[]
+}
+
+model Post {
+  id        String    @id @default(cuid())
+  content   String
+  imageUrl  String?
+  authorId  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  comments  Comment[]
+  likes     Like[]
+  author    User      @relation(fields: [authorId], references: [id])
+}
+
+model Like {
+  id     String @id @default(cuid())
+  userId String
+  postId String
+  post   Post   @relation(fields: [postId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  authorId  String
+  postId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  author    User     @relation(fields: [authorId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id])
+}
+
+model Follows {
+  id          String @id @default(cuid())
+  followerId  String
+  followingId String
+  follower    User   @relation("followers", fields: [followerId], references: [id])
+  following   User   @relation("following", fields: [followingId], references: [id])
+}
+
+model Project {
+  id           String       @id @default(cuid())
+  title        String
+  description  String
+  thumbnail    String
+  githubUrl    String
+  liveUrl      String?
+  date         DateTime     @default(now())
+  userId       String
+  updatedAt    DateTime     @updatedAt
+  user         User         @relation(fields: [userId], references: [id])
+  technologies Technology[] @relation("ProjectTechnologies")
+}
+
+model Blog {
+  id            String       @id @default(cuid())
+  title         String
+  description   String
+  content       String
+  blogThumbnail String
+  publishedAt   DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  userId        String
+  user          User         @relation(fields: [userId], references: [id])
+  technologies  Technology[] @relation("BlogTechnologies")
+}
+
+model Technology {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  blogs    Blog[]    @relation("BlogTechnologies")
+  projects Project[] @relation("ProjectTechnologies")
+}
