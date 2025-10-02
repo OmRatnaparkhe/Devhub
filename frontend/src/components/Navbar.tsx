@@ -11,15 +11,15 @@ const Navbar = () => {
 
   // Define navigation differently for signed in / out
   const navigation = isSignedIn
-    ? [{name:"Home",href:"/home"},
-        { name: "Dashboard", href: "/dashboard" },
+    ? [{name:"Home",href:"/homefeed"},
         { name: "Projects", href: "/projects" },
+        
         { name: "Blog", href: "/blog" },
       ]
     : [
         { name: "Home", href: "/" },
-        { name: "Dashboard", href: "/dashboard" }, // optional if you want them to see it
-        { name: "Projects", href: "/projects" },
+        { name: "Projects", href: "/projects" }, // optional if you want them to see it
+        
         { name: "Blog", href: "/blog" },
       ];
 

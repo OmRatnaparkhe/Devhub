@@ -7,8 +7,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+//This enum is to define type of notifications
+enum NotificationType{
+  COMMENT
+  LIKE
+  MESSAGE
+  FOLLOW
+}
 model User {
-  id           String    @id @default(cuid())
+  id           String    @id
   email        String?    @unique
   name         String
   username     String    @unique
@@ -27,6 +35,17 @@ model User {
   likes        Like[]
   posts        Post[]
   projects     Project[]
+  bookmarks Bookmark[]
+
+  //For messages
+  conversationsStarted Conversation[] @relation("userOne")
+  conversationsReceived Conversation[] @relation("userTwo")
+  messagesSent Message[] @relation("sender")
+  messagesReceived Message[] @relation("receiver")
+
+  //For notifications
+  notifications Notification[] @relation("notificationsForUser") //Notification for this User
+  triggeredActions Notification[] @relation("actorNotifications") //Notification caused by this User
 }
 
 model Post {
@@ -39,8 +58,23 @@ model Post {
   comments  Comment[]
   likes     Like[]
   author    User      @relation(fields: [authorId], references: [id])
+  bookmarks Bookmark[]
+
+  notifications Notification[]
 }
 
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId]) // A user can only bookmark a post once
+}
 model Like {
   id     String @id @default(cuid())
   userId String
@@ -53,11 +87,13 @@ model Comment {
   id        String   @id @default(cuid())
   content   String
   authorId  String
-  postId    String
+  postId    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   author    User     @relation(fields: [authorId], references: [id])
-  post      Post     @relation(fields: [postId], references: [id])
+  post      Post?     @relation(fields: [postId], references: [id])
+  projectId String?
+  project Project? @relation(fields:[projectId],references: [id])
 }
 
 model Follows {
@@ -74,6 +110,7 @@ model Project {
   description  String
   thumbnail    String
   githubUrl    String
+  comments     Comment[]
   liveUrl      String?
   date         DateTime     @default(now())
   userId       String
@@ -100,4 +137,52 @@ model Technology {
   name     String    @unique
   blogs    Blog[]    @relation("BlogTechnologies")
   projects Project[] @relation("ProjectTechnologies")
+}
+
+
+model Conversation{
+  id String @id @default(cuid())
+  userOneId String
+  userTwoId String
+  userOne User @relation("userOne",fields: [userOneId],references: [id],onDelete: Cascade)
+  userTwo User @relation("userTwo",fields:[userTwoId],references: [id],onDelete: Cascade)
+  messages Message[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userOneId,userTwoId])
+}
+
+model Message{
+  id String @id @default(cuid())
+  content String
+  senderId String
+  receiverId String
+  conversationId String
+  createdAt DateTime @default(now())
+  sender User @relation("sender",fields:[senderId],references: [id],onDelete:Cascade)
+  receiver User @relation("receiver",fields:[receiverId],references: [id],onDelete:Cascade)
+  conversation Conversation @relation(fields: [conversationId],references:[id],onDelete:Cascade)
+}
+
+
+model Notification{
+  id String @id @default(cuid())
+  createdAt DateTime @default(now())
+  type NotificationType
+  read Boolean @default(false)
+
+  //For the User who received notifications
+  userId String
+  user User @relation("notificationsForUser",fields:[userId],references: [id],onDelete:Cascade)
+
+  //For the User who triggered notification
+  actorId String
+  actor User @relation("actorNotifications",fields:[actorId],references: [id],onDelete:Cascade)
+
+  //For post related notifications(LIKE,COMMENT)
+  postId String?
+  post Post? @relation(fields:[postId],references: [id],onDelete:Cascade)
+
+  @@unique([userId,postId,actorId,type])
 }

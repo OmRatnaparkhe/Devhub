@@ -39,9 +39,8 @@ const server_1 = require("../server");
 const uploadFile_1 = __importStar(require("../middleware/uploadFile"));
 const router = (0, express_1.Router)();
 router.use((0, express_2.requireAuth)());
-const postRoutes = router;
 //For creating a post
-router.post("/", express_2.requireAuth, uploadFile_1.default.single("image"), async (req, res) => {
+router.post("/", (0, express_2.requireAuth)(), uploadFile_1.default.single("image"), async (req, res) => {
     try {
         const { content } = req.body;
         const auth = req.auth;
@@ -75,8 +74,69 @@ router.post("/", express_2.requireAuth, uploadFile_1.default.single("image"), as
         res.status(500).json({ error: "Something went wrong" });
     }
 });
+// Toggles a bookmark on a post
+router.post("/:id/bookmark", (0, express_2.requireAuth)(), async (req, res) => {
+    try {
+        const postId = req.params.id;
+        const userId = req.auth?.userId;
+        if (!userId)
+            return res.status(401).json({ error: "Unauthorized" });
+        const existingBookmark = await server_1.prisma.bookmark.findUnique({
+            where: { userId_postId: { userId, postId } },
+        });
+        if (existingBookmark) {
+            // If it exists, delete it (un-bookmark)
+            await server_1.prisma.bookmark.delete({
+                where: { id: existingBookmark.id },
+            });
+            return res.json({ bookmarked: false });
+        }
+        else {
+            // If it doesn't exist, create it (bookmark)
+            await server_1.prisma.bookmark.create({
+                data: { userId, postId },
+            });
+            return res.json({ bookmarked: true });
+        }
+    }
+    catch (error) {
+        console.error("Error toggling bookmark:", error);
+        res.status(500).json({ error: "Something went wrong" });
+    }
+});
+// --- GET /api/posts/bookmarks ---
+// Fetches all posts bookmarked by the current user
+router.get("/bookmarks", (0, express_2.requireAuth)(), async (req, res) => {
+    try {
+        const userId = req.auth?.userId;
+        if (!userId)
+            return res.status(401).json({ error: "Unauthorized" });
+        const bookmarks = await server_1.prisma.bookmark.findMany({
+            where: { userId },
+            orderBy: { createdAt: "desc" },
+            include: {
+                // Include the full post data for each bookmark
+                post: {
+                    include: {
+                        author: true,
+                        likes: true,
+                        comments: true,
+                        bookmarks: { where: { userId } }, // Include bookmark status for the current user
+                    },
+                },
+            },
+        });
+        // Map the result to return an array of posts, not bookmarks
+        const bookmarkedPosts = bookmarks.map(b => b.post);
+        res.json(bookmarkedPosts);
+    }
+    catch (error) {
+        console.error("Error fetching bookmarks:", error);
+        res.status(500).json({ error: "Something went wrong" });
+    }
+});
 //For fetching posts
-router.get("/feed", express_2.requireAuth, async (req, res) => {
+router.get("/feed", (0, express_2.requireAuth)(), async (req, res) => {
     try {
         const auth = req.auth;
         if (!auth || !auth.userId) {
@@ -90,7 +150,7 @@ router.get("/feed", express_2.requireAuth, async (req, res) => {
             where: {
                 OR: [
                     { authorId: userId },
-                    { author: { followers: { some: { followerId: userId } } } }
+                    { author: { following: { some: { followerId: userId } } } }
                 ],
             },
             include: {
@@ -99,6 +159,9 @@ router.get("/feed", express_2.requireAuth, async (req, res) => {
                 comments: {
                     include: { author: true }
                 },
+                bookmarks: {
+                    where: { userId: userId ?? undefined }
+                }
             },
             orderBy: { createdAt: "desc" },
             skip: (page - 1) * limit,
@@ -117,7 +180,7 @@ router.get("/feed", express_2.requireAuth, async (req, res) => {
     }
 });
 //For liking/disliking post
-router.post("/:id/like", express_2.requireAuth, async (req, res) => {
+router.post("/:id/like", (0, express_2.requireAuth)(), async (req, res) => {
     try {
         const auth = req.auth;
         if (!auth || !auth.userId) {
@@ -146,6 +209,29 @@ router.post("/:id/like", express_2.requireAuth, async (req, res) => {
                     userId, postId
                 }
             });
+            try {
+                const post = await server_1.prisma.post.findUnique({
+                    where: {
+                        id: postId
+                    },
+                    select: {
+                        authorId: true
+                    }
+                });
+                if (post && post.authorId !== userId) {
+                    await server_1.prisma.notification.create({
+                        data: {
+                            type: "LIKE",
+                            userId: post.authorId,
+                            actorId: userId,
+                            postId: postId
+                        }
+                    });
+                }
+            }
+            catch (notificationError) {
+                console.error("Failed to create like notification:", notificationError);
+            }
             res.json({ like: true });
             return;
         }
@@ -156,7 +242,7 @@ router.post("/:id/like", express_2.requireAuth, async (req, res) => {
     }
 });
 // For commenting on posts
-router.post("/:id/comment", express_2.requireAuth, async (req, res) => {
+router.post("/:id/comment", (0, express_2.requireAuth)(), async (req, res) => {
     try {
         const auth = req.auth;
         if (!auth || !auth.userId) {
@@ -177,6 +263,29 @@ router.post("/:id/comment", express_2.requireAuth, async (req, res) => {
             },
             include: { author: true }
         });
+        try {
+            const post = await server_1.prisma.post.findUnique({
+                where: {
+                    id: authorId
+                },
+                select: {
+                    authorId: true
+                }
+            });
+            if (post && post.authorId !== authorId) {
+                await server_1.prisma.notification.create({
+                    data: {
+                        type: "COMMENT",
+                        userId: post.authorId,
+                        actorId: authorId,
+                        postId: postId
+                    }
+                });
+            }
+        }
+        catch (notificationError) {
+            console.error("Failed to create comment notification:", notificationError);
+        }
         res.json(comment);
     }
     catch (err) {
@@ -184,4 +293,4 @@ router.post("/:id/comment", express_2.requireAuth, async (req, res) => {
         res.status(500).json({ error: "Something went wrong!!" });
     }
 });
-exports.default = postRoutes;
+exports.default = router;

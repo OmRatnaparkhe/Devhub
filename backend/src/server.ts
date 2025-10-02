@@ -3,11 +3,16 @@ import dotenv from "dotenv";
 dotenv.config();
 import express, { Request, Response, NextFunction } from "express";
 import { clerkMiddleware } from "@clerk/express";
-import postRoutes from "./routes/post.routes";
+import PostRouter from "./routes/post.routes";
 import cors from "cors";
-import userRoutes from "./routes/user.routes";
+import http from "http"
+import UserRouter from "./routes/user.routes";
 import ProjectRouter from "./routes/project.routes";
 import BlogsRouter from "./routes/blog.routes";
+import MessagesRouter from "./routes/message.routes"
+import notificationRoutes from "./routes/notification.routes";
+import dashboardRoutes from "./routes/dashboard.routes"
+import {Server} from "socket.io"
 import { PrismaClient } from "@prisma/client";
 // import webhookRouter from "./routes/webhook.routes";
 
@@ -15,15 +20,48 @@ import { PrismaClient } from "@prisma/client";
 const app = express();
 
 export const prisma = new PrismaClient();
-
-app.use(
-  cors({
+const server = http.createServer(app)
+const io = new Server(server,{
+ cors:{
     origin: "http://localhost:5173", // frontend URL
     credentials: true,
-  })
-);
+  }
+})
+app.use(cors())
 app.use(express.json());
 
+
+const userSocketMap : {[userId:string]:string} = {};
+
+io.on("connection",(socket)=>{
+  console.log("User is connected ",socket.id);
+
+  const userId = socket.handshake.query.userId as string
+  if(userId){
+    userSocketMap[userId] = socket.id;
+    console.log(`User ${userId} is mapped to ${socket.id}`)
+  }
+
+  socket.on("sendMessage",({receiverId,message})=>{
+    const receiverSocketId = userSocketMap[receiverId];
+    if(receiverSocketId){
+      io.to(receiverSocketId).emit("newMessage",message)
+    }
+  })
+
+  socket.on("disconnect",()=>{
+    console.log("User disconnected",socket.id)
+    for(const [key,value] of Object.entries(userSocketMap)){
+      if(value == socket.id){
+        delete userSocketMap[key]
+        break;
+      }
+    }
+  })
+})
+
+app.set("socketio",io)
+export {userSocketMap}
 // ✅ Use standard Clerk env keys (no VITE_ prefix on server)
 const { CLERK_PUBLISHABLE_KEY, CLERK_SECRET_KEY } = process.env;
 
@@ -42,8 +80,11 @@ app.use(
 // ✅ API routes
 app.use("/api/projects", ProjectRouter);
 app.use("/api/blogs", BlogsRouter);
-app.use("/api/posts", postRoutes);
-app.use("/api/users", userRoutes);
+app.use("/api/posts", PostRouter);
+app.use("/api/users", UserRouter);
+app.use("/api/messages",MessagesRouter);
+app.use("/api/notifications",notificationRoutes)
+app.use("/api/dashboard",dashboardRoutes)
 // app.use("/api/webhooks", webhookRouter)
 
 // ✅ Debug test route
@@ -62,6 +103,6 @@ app.use(
   }
 );
 
-app.listen(3000, () =>
+server.listen(3000, () =>
   console.log("🚀 Server is running on http://localhost:3000")
 );

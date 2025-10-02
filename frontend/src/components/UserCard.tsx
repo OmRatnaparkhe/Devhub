@@ -16,6 +16,7 @@ interface UserCardProps {
   user: User;
   isFollowing: boolean;
   onFollowToggle: (userId: string) => void;
+  size?:"compact"
 }
 
 export const UserCard = ({ user, isFollowing, onFollowToggle }: UserCardProps) => {

@@ -16,7 +16,7 @@ export function ProtectedRoute({children}:ProtectedRouteProps){
           </button>
         </SignInButton>
         <p className="text-md mt-4">
-          Or <a href="/" className="underline text-primary">go back to Home</a>
+          Or <a href="/welcome" className="underline text-primary">go back to Home</a>
         </p>
       </div>
     );

@@ -40,7 +40,7 @@ const uploadFile_1 = __importStar(require("../middleware/uploadFile"));
 const router = (0, express_2.Router)();
 const BlogsRouter = router;
 //For creating a blog
-router.post("/create", express_1.requireAuth, uploadFile_1.default.single("blog"), async (req, res) => {
+router.post("/create", (0, express_1.requireAuth)(), uploadFile_1.default.single("blog"), async (req, res) => {
     try {
         const auth = req.auth;
         if (!auth || !auth.userId) {
@@ -81,7 +81,7 @@ router.post("/create", express_1.requireAuth, uploadFile_1.default.single("blog"
     }
 });
 //For fetching all blogs by certain user
-router.get("/user/:id", express_1.requireAuth, async (req, res) => {
+router.get("/user/:id", (0, express_1.requireAuth)(), async (req, res) => {
     try {
         const userId = req.params.id;
         if (!userId) {
@@ -107,7 +107,7 @@ router.get("/user/:id", express_1.requireAuth, async (req, res) => {
     }
 });
 //For fetching particular blog by user
-router.get("/:id", express_1.requireAuth, async (req, res) => {
+router.get("/:id", (0, express_1.requireAuth)(), async (req, res) => {
     try {
         const blogId = req.params.id;
         if (!blogId) {
@@ -131,7 +131,7 @@ router.get("/:id", express_1.requireAuth, async (req, res) => {
     }
 });
 //For updating blog
-router.put("/:id", express_1.requireAuth, async (req, res) => {
+router.put("/:id", (0, express_1.requireAuth)(), async (req, res) => {
     try {
         const auth = req.auth;
         const blogId = req.params.id;
@@ -176,7 +176,7 @@ router.put("/:id", express_1.requireAuth, async (req, res) => {
     }
 });
 //For deleting a blog
-router.delete("/:id", express_1.requireAuth, async (req, res) => {
+router.delete("/:id", (0, express_1.requireAuth)(), async (req, res) => {
     try {
         const blogId = req.params.id;
         const auth = req.auth;

@@ -26,7 +26,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { SelectPortal } from "@radix-ui/react-select";
 import { useAuth } from "@clerk/clerk-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -101,9 +100,7 @@ async function onSubmit(data: ProfileFormValues) {
                 
             },
             body: formData,
-            
-            
-            
+        
         });
        
 

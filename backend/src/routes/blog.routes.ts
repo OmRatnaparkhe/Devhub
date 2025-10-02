@@ -9,7 +9,7 @@ const BlogsRouter = router;
 
 //For creating a blog
 
-router.post("/create",requireAuth,upload.single("blog"),async(req:Request,res:Response)=>{
+router.post("/create",requireAuth(),upload.single("blog"),async(req:Request,res:Response)=>{
     try{
         const auth = req.auth;
         if (!auth || !auth.userId) {
@@ -52,7 +52,7 @@ router.post("/create",requireAuth,upload.single("blog"),async(req:Request,res:Re
 });
 
 //For fetching all blogs by certain user
-router.get("/user/:id",requireAuth,async(req:Request,res:Response)=>{
+router.get("/user/:id",requireAuth(),async(req:Request,res:Response)=>{
     try{
         const userId = req.params.id;
 
@@ -81,7 +81,7 @@ router.get("/user/:id",requireAuth,async(req:Request,res:Response)=>{
 });
 
 //For fetching particular blog by user
-router.get("/:id",requireAuth,async(req:Request,res:Response)=>{
+router.get("/:id",requireAuth(),async(req:Request,res:Response)=>{
     try{
         const blogId = req.params.id;
         if(!blogId){
@@ -106,7 +106,7 @@ router.get("/:id",requireAuth,async(req:Request,res:Response)=>{
 });
 
 //For updating blog
-router.put("/:id",requireAuth,async(req:Request,res:Response)=>{
+router.put("/:id",requireAuth(),async(req:Request,res:Response)=>{
     try{
         const auth = req.auth ;
         const blogId = req.params.id;
@@ -154,7 +154,7 @@ router.put("/:id",requireAuth,async(req:Request,res:Response)=>{
     }
 });
 //For deleting a blog
-router.delete("/:id",requireAuth,async(req:Request,res:Response)=>{
+router.delete("/:id",requireAuth(),async(req:Request,res:Response)=>{
     try{
         const blogId = req.params.id;
         const auth = req.auth ;

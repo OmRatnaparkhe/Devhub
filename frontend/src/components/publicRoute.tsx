@@ -10,7 +10,7 @@ export function PublicRoute({children}:PublicRouteProps){
     const navigate = useNavigate();
 
     if(isLoaded && isSignedIn){
-        navigate("/profileSetup",{replace:true});
+        navigate("/",{replace:true});
     }
 
     if(!isLoaded){
