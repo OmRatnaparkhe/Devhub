@@ -122,11 +122,11 @@ router.get("/feed",requireAuth(),async(req:Request,res:Response)=>{
         const limit = parseInt((req.query.limit as string) || "5",10);
 
         const posts = await prisma.post.findMany({
-            
             where:{
                 OR:[
-                    {authorId:userId},
-                    {author:{following : {some : {followerId : userId}}}}
+                    { authorId: userId },
+                    // Authors whose followers include the current user
+                    { author: { followers: { some: { followerId: userId } } } }
                 ],
             },
             include : {
