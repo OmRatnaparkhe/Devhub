@@ -32,7 +32,7 @@ export function ConnectionsPage() {
             try {
                 const token = await getToken();
                 // Always fetch the list of users the current user is following
-                const response = await fetch(`${process.env.BACKEND_URL_PROD}api/users/following`, {
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/users/following`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const followingList: User[] = await response.json();
@@ -60,7 +60,7 @@ export function ConnectionsPage() {
             const endpoint = activeTab === 'followers' ? 'followers' : 'following';
             try {
                 const token = await getToken();
-                const response = await fetch(`${process.env.BACKEND_URL_PROD}api/users/${endpoint}`, {
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/users/${endpoint}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const data = await response.json();
@@ -92,7 +92,7 @@ export function ConnectionsPage() {
 
         try {
             const token = await getToken();
-            const response = await fetch(`${process.env.BACKEND_URL_PROD}api/users/${userId}/follow`, {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/users/${userId}/follow`, {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}` },
             });

@@ -140,7 +140,7 @@ export const MessagesPage = () => {
     // Socket listener initialized once per currentUser
     useEffect(() => {
         if (currentUser?.id ?? "") {
-            const socketInstance = io(`${process.env.BACKEND_URL_PROD}`, {
+            const socketInstance = io(`${import.meta.env.VITE_BACKEND_URL_PROD}`, {
                 query: { userId: currentUser?.id ?? "" }
             });
             socket.current = socketInstance;
@@ -175,7 +175,7 @@ export const MessagesPage = () => {
             try {
                 const token = await getToken();
                 if (!token) return;
-                const res = await fetch(`${process.env.BACKEND_URL_PROD}api/messages/conversations`, {
+                const res = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/messages/conversations`, {
                     headers: { 'Authorization': `Bearer ${token}` },
                     signal: controller.signal,
                 });
@@ -218,7 +218,7 @@ export const MessagesPage = () => {
         try {
             const token = await getToken();
             if (!token) return;
-            const res = await fetch(`${process.env.BACKEND_URL_PROD}api/messages/conversations/${user.id}`, {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/messages/conversations/${user.id}`, {
                 headers: { 'Authorization': `Bearer ${token}` },
                 signal: controller.signal,
             });
@@ -227,7 +227,7 @@ export const MessagesPage = () => {
             setMessages(data);
 
             // Mark as read (no need to await if you want max snappiness)
-            fetch(`${process.env.BACKEND_URL_PROD}api/messages/mark-read`, {
+            fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/messages/mark-read`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -248,7 +248,7 @@ export const MessagesPage = () => {
         if (!token) return;
 
         try {
-            await fetch(`${process.env.BACKEND_URL_PROD}api/messages/send/${selectedUser.id}`, {
+            await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/messages/send/${selectedUser.id}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,

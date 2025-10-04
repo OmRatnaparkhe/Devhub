@@ -129,7 +129,7 @@ export const Profile = () => {
         body.append("profilePic", formData.profilePic || "");
       }
 
-      const res = await fetch(`${process.env.BACKEND_URL_PROD}api/users/${profile?.id}/update`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/users/${profile?.id}/update`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`
@@ -156,7 +156,7 @@ export const Profile = () => {
     queryFn: async () => {
       const token = await getToken();
       if (!token || !userId) return null;
-      const response = await fetch(`${process.env.BACKEND_URL_PROD}api/users/${userId}/profile?full=true`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/users/${userId}/profile?full=true`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (!response.ok) throw new Error("Failed to fetch profile");

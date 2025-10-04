@@ -18,7 +18,7 @@ export const BookmarksPage = () => {
             setLoading(true);
             try {
                 const token = await getToken();
-                const response = await fetch(`${process.env.BACKEND_URL_PROD}api/posts/bookmarks`, {
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/posts/bookmarks`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const data = await response.json();

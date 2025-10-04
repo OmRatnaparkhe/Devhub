@@ -93,7 +93,7 @@ async function onSubmit(data: ProfileFormValues) {
         
         const token = await getToken();
         
-        const response = await fetch(`${process.env.BACKEND_URL_PROD}api/users/profile`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/users/profile`, {
             method: "POST",
             headers: {
                 Authorization: `Bearer ${token}`,

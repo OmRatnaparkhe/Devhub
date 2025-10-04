@@ -41,7 +41,7 @@ export const CreatePost = ({ onPostCreated }: CreatePostProps) => {
 
     try {
       const token = await getToken();
-      const response = await fetch(`${process.env.BACKEND_URL_PROD}api/posts`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/posts`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

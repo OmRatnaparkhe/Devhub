@@ -27,7 +27,7 @@ export default function OnBoarded() {
                     return;
                 }
 
-                const response = await fetch(`${process.env.BACKEND_URL_PROD}api/users/${userId}/profile`, {
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/users/${userId}/profile`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
