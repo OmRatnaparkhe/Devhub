@@ -82,10 +82,21 @@ io.on("connection",(socket)=>{
 app.set("socketio",io)
 export {userSocketMap}
 // ✅ Use standard Clerk env keys (no VITE_ prefix on server)
+console.log("🔍 Environment check:", {
+  CLERK_PUBLISHABLE_KEY: process.env.CLERK_PUBLISHABLE_KEY ? "✅ SET" : "❌ MISSING",
+  CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY ? "✅ SET" : "❌ MISSING", 
+  DATABASE_URL: process.env.DATABASE_URL ? "✅ SET" : "❌ MISSING",
+  NODE_ENV: process.env.NODE_ENV || "not set"
+});
+
 const { CLERK_PUBLISHABLE_KEY, CLERK_SECRET_KEY } = process.env;
 
 if (!CLERK_PUBLISHABLE_KEY || !CLERK_SECRET_KEY) {
-  throw new Error("❌ Missing Clerk keys in environment (.env file)");
+  console.error("❌ Missing Clerk keys:", {
+    CLERK_PUBLISHABLE_KEY: !!CLERK_PUBLISHABLE_KEY,
+    CLERK_SECRET_KEY: !!CLERK_SECRET_KEY
+  });
+  throw new Error("❌ Missing Clerk keys in environment");
 }
 
 // ✅ Clerk middleware applied globally
@@ -122,6 +133,23 @@ app.use(
   }
 );
 
-// server.listen(3000, () =>
-//   console.log("🚀 Server is running on http://localhost:3000")
-// );
+// ✅ Add startup error handling
+process.on('uncaughtException', (error) => {
+  console.error('🚨 Uncaught Exception:', error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('🚨 Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
+});
+
+try {
+  const PORT = process.env.PORT || 3000;
+  server.listen(PORT, () => {
+    console.log(`🚀 Server is running on port ${PORT}`);
+  });
+} catch (error) {
+  console.error('🚨 Server startup error:', error);
+  process.exit(1);
+}
