@@ -14,7 +14,7 @@ import notificationRoutes from "./routes/notification.routes";
 import dashboardRoutes from "./routes/dashboard.routes"
 import {Server} from "socket.io"
 import { PrismaClient } from "@prisma/client";
-// import webhookRouter from "./routes/webhook.routes";
+
 
 
 const app = express();
@@ -27,10 +27,31 @@ const io = new Server(server,{
     credentials: true,
   }
 })
-const corsOptions = {
-  origin:["http://localhost:5173", "https://devhub-ten-eta.vercel.app/"]
-}
-app.use(cors(corsOptions))
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://devhub-ten-eta.vercel.app"
+];
+
+app.use(cors({
+  origin: function(origin, callback) {
+    // allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET","POST","PUT","DELETE","OPTIONS"],
+  allowedHeaders: ["Content-Type","Authorization"]
+}));
+
+// Optionally handle OPTIONS preflight
+app.options("*", cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 app.use(express.json());
 
 
