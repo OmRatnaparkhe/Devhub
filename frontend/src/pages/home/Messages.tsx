@@ -139,9 +139,9 @@ export const MessagesPage = () => {
 
     // Socket listener initialized once per currentUser
     useEffect(() => {
-        if (currentUser?.id) {
+        if (currentUser?.id ?? "") {
             const socketInstance = io(`${process.env.BACKEND_URL_PROD}` {
-                query: { userId: currentUser.id }
+                query: { userId: currentUser?.id ?? "" }
             });
             socket.current = socketInstance;
 
