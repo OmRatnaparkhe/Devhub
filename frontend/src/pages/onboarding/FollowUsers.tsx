@@ -38,7 +38,7 @@ export const FollowUsers = ({ context = 'page' }: FollowUsersProps) => {
         const initializeFollowStatus = async () => {
             const token = await getToken();
             try {
-                const response = await fetch(`http://localhost:3000/api/users/following`, {
+                const response = await fetch(`${process.env.BACKEND_URL_PROD}api/users/following`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 if (!response.ok) {
@@ -67,7 +67,7 @@ export const FollowUsers = ({ context = 'page' }: FollowUsersProps) => {
         const limit = context === 'page' ? 10 : 5;
         try {
             const token = await getToken();
-            const response = await fetch(`http://localhost:3000/api/users/search?query=${encodeURIComponent(searchTerm)}&limit=${limit}`, {
+            const response = await fetch(`${process.env.BACKEND_URL_PROD}api/users/search?query=${encodeURIComponent(searchTerm)}&limit=${limit}`, {
                 headers: { Authorization: token ? `Bearer ${token}` : "" }
             });
             if (!response.ok) {
@@ -97,7 +97,7 @@ export const FollowUsers = ({ context = 'page' }: FollowUsersProps) => {
         setFollowingStatus(prev => ({ ...prev, [userId]: !isCurrentlyFollowing }));
         try {
             const token = await getToken();
-            await fetch(`http://localhost:3000/api/users/${userId}/follow`, {
+            await fetch(`${process.env.BACKEND_URL_PROD}api/users/${userId}/follow`, {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}` }
             });

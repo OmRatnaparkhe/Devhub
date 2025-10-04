@@ -55,7 +55,7 @@ const ProjectInputModal = ({ isOpen, onClose, onSubmit }) => {
       .forEach(t => formData.append("technologies", t));
 
     try {
-      const res = await fetch("http://localhost:3000/api/projects/create", {
+      const res = await fetch(`${process.env.BACKEND_URL_PROD}api/projects/create`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,

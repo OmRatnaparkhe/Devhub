@@ -58,7 +58,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
         try {
             // Fetch all notifications; filtering happens on the client side here.
             // Alternatively, create separate backend endpoints for counts for efficiency.
-            const res = await fetch('http://localhost:3000/api/notifications', {
+            const res = await fetch(`${process.env.BACKEND_URL_PROD}api/notifications`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -107,7 +107,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
         if (!userId) return;
 
         // Establish connection, passing userId for authentication/room joining on backend
-        const socket = io('http://localhost:3000', { query: { userId } });
+        const socket = io(`${process.env.BACKEND_URL_PROD}`, { query: { userId } });
 
         // Listen for all new notification events (like, comment, follow, message)
         socket.on('new_notification', (newNotification: Notification) => {
@@ -144,7 +144,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
         setNotifications(prevList => prevList.map(n => ({ ...n, read: true })));
 
         try {
-            await fetch('http://localhost:3000/api/notifications/mark-read', {
+            await fetch(`${process.env.BACKEND_URL_PROD}api/notifications/mark-read`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });

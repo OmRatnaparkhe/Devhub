@@ -49,7 +49,7 @@ export const PostCard = React.memo(( { post, currentUserId }: PostCardProps) => 
 
     try {
       const token = await getToken();
-      const response = await fetch(`http://localhost:3000/api/posts/${post.id}/like`, {
+      const response = await fetch(`${process.env.BACKEND_URL_PROD}api/posts/${post.id}/like`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -64,7 +64,7 @@ export const PostCard = React.memo(( { post, currentUserId }: PostCardProps) => 
     setIsBookmarked(prev => !prev);
     try {
       const token = await getToken();
-      await fetch(`http://localhost:3000/api/posts/${post.id}/bookmark`, {
+      await fetch(`${process.env.BACKEND_URL_PROD}api/posts/${post.id}/bookmark`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -80,7 +80,7 @@ export const PostCard = React.memo(( { post, currentUserId }: PostCardProps) => 
 
     try {
       const token = await getToken();
-      const response = await fetch(`http://localhost:3000/api/posts/${post.id}/comment`, {
+      const response = await fetch(`${process.env.BACKEND_URL_PROD}api/posts/${post.id}/comment`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

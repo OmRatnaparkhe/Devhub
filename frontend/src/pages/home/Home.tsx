@@ -25,7 +25,7 @@ export const Home = () => {
 			setLoading(true);
 			try {
 				const token = await getToken();
-				const response = await fetch(`http://localhost:3000/api/posts/feed?page=${page}&limit=5`, {
+				const response = await fetch(`${process.env.BACKEND_URL_PROD}posts/feed?page=${page}&limit=5`, {
 					method: "GET",
 					headers: {
 						Authorization: token ? `Bearer ${token}` : "",

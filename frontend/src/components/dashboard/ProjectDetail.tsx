@@ -47,8 +47,8 @@ const ProjectDetailPage = () => {
       try {
         const token = await getToken();
         const [projectRes, commentsRes] = await Promise.all([
-          fetch(`http://localhost:3000/api/projects/${projectId}`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`http://localhost:3000/api/projects/${projectId}/getComments`, { headers: { Authorization: `Bearer ${token}` } })
+          fetch(`${process.env.BACKEND_URL_PROD}api/projects/${projectId}`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${process.env.BACKEND_URL_PROD}api/projects/${projectId}/getComments`, { headers: { Authorization: `Bearer ${token}` } })
         ]);
         if (!projectRes.ok) throw new Error("Failed to fetch project details");
         if (!commentsRes.ok) throw new Error("Failed to fetch comments");
@@ -69,7 +69,7 @@ const ProjectDetailPage = () => {
 
     try {
       const token = await getToken();
-      const response = await fetch(`http://localhost:3000/api/projects/${projectId}/comment`, {
+      const response = await fetch(`${process.env.BACKEND_URL_PROD}api/projects/${projectId}/comment`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -93,7 +93,7 @@ const ProjectDetailPage = () => {
     setComments(prevComments => prevComments.filter(comment => comment.id !== commentId));
     try {
       const token = await getToken();
-      const response = await fetch(`http://localhost:3000/api/projects/comment/${commentId}`, {
+      const response = await fetch(`${process.env.BACKEND_URL_PROD}api/projects/comment/${commentId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
