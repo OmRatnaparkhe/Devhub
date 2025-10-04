@@ -48,7 +48,7 @@ app.use(cors({
 }));
 
 // Optionally handle OPTIONS preflight
-app.options("*", cors({
+app.options("/*", cors({
   origin: allowedOrigins,
   credentials: true
 }));
