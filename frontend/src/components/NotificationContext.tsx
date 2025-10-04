@@ -62,9 +62,11 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
-            if (!res.ok) throw new Error("Failed to fetch notification data");
+            if (!res.ok) {
+                throw new Error(`Failed to fetch notification data (${res.status} ${res.statusText})`);
+            }
             
-            const data = await res.json();
+            const data = await res.json().catch(() => ({}));
 
             if (data.notifications && Array.isArray(data.notifications)) {
                 let messageCount = 0;

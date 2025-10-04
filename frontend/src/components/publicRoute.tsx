@@ -10,7 +10,7 @@ export function PublicRoute({children}:PublicRouteProps){
     const navigate = useNavigate();
 
     if(isLoaded && isSignedIn){
-        navigate("/",{replace:true});
+        navigate("/homefeed",{replace:true});
     }
 
     if(!isLoaded){

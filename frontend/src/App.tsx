@@ -36,14 +36,14 @@ const App = () => (
           <Navbar />
           <Routes>
             <Route path="/" element={
-              <ProtectedRoute>
-                <OnBoarded />
-              </ProtectedRoute>
-            } />
-            <Route path="/welcome" element={
               <PublicRoute>
                 <Landing />
               </PublicRoute>
+            } />
+            <Route path="/onboard" element={
+              <ProtectedRoute>
+                <OnBoarded />
+              </ProtectedRoute>
             } />
 
 

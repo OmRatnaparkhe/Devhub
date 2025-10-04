@@ -41,7 +41,12 @@ export const FollowUsers = ({ context = 'page' }: FollowUsersProps) => {
                 const response = await fetch(`http://localhost:3000/api/users/following`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
-                const followingList: User[] = await response.json();
+                if (!response.ok) {
+                    console.error("Failed to fetch following list:", response.status, response.statusText);
+                    return;
+                }
+                const json = await response.json().catch(() => []);
+                const followingList: User[] = Array.isArray(json) ? json : [];
                 const followingStatusMap = followingList.reduce((acc, user) => {
                     acc[user.id] = true;
                     return acc;
@@ -62,13 +67,20 @@ export const FollowUsers = ({ context = 'page' }: FollowUsersProps) => {
         const limit = context === 'page' ? 10 : 5;
         try {
             const token = await getToken();
-            const response = await fetch(`http://localhost:3000/api/users/search?query=${searchTerm}&limit=${limit}`, {
-                headers: { Authorization: `Bearer ${token}` }
+            const response = await fetch(`http://localhost:3000/api/users/search?query=${encodeURIComponent(searchTerm)}&limit=${limit}`, {
+                headers: { Authorization: token ? `Bearer ${token}` : "" }
             });
-            const data: User[] = await response.json();
+            if (!response.ok) {
+                console.error("Failed to fetch users:", response.status, response.statusText);
+                setAllFetchedUsers([]);
+                return;
+            }
+            const json = await response.json().catch(() => []);
+            const data: User[] = Array.isArray(json) ? json : [];
             setAllFetchedUsers(data);
         } catch (error) {
             console.error("Failed to fetch users:", error);
+            setAllFetchedUsers([]);
         } finally {
             setLoading(false);
         }
@@ -97,20 +109,18 @@ export const FollowUsers = ({ context = 'page' }: FollowUsersProps) => {
 
     // --- UPDATE: Final filtering logic ---
     const displayedUsers = useMemo(() => {
+        const usersArray = Array.isArray(allFetchedUsers) ? allFetchedUsers : [];
         if (context === 'widget') {
             if (isSearchActive) {
-                // --- Search Mode ---
-                // If a search is active, show the results from allFetchedUsers directly.
-                // The follow status filter is disabled to allow finding specific users.
-                return allFetchedUsers.slice(0, 3);
+                // Search Mode: show results directly
+                return usersArray.slice(0, 3);
             } else {
-                // --- Suggestion Mode ---
-                // If no search is active, filter out users already followed.
-                return allFetchedUsers.filter(user => !followingStatus[user.id]).slice(0, 3);
+                // Suggestion Mode: filter out users already followed
+                return usersArray.filter(user => !followingStatus[user.id]).slice(0, 3);
             }
         }
         // For 'page' mode, just return all fetched users (search results).
-        return allFetchedUsers;
+        return usersArray;
     }, [allFetchedUsers, followingStatus, context, isSearchActive]);
 
     const handleSearchClick = () => {

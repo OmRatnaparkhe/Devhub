@@ -21,32 +21,39 @@ export const Home = () => {
         // and stops if there are no more pages.
         if (!hasMore || (page === 1 && posts.length > 0)) return;
 
-        const fetchPage = async () => {
-            setLoading(true);
-            try {
-                const token = await getToken()
-                const response = await fetch(`http://localhost:3000/api/posts/feed?page=${page}&limit=5`, {
-                    method: "GET"
-                    , headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-                const data = await response.json();
+		const fetchPage = async () => {
+			setLoading(true);
+			try {
+				const token = await getToken();
+				const response = await fetch(`http://localhost:3000/api/posts/feed?page=${page}&limit=5`, {
+					method: "GET",
+					headers: {
+						Authorization: token ? `Bearer ${token}` : "",
+					},
+				});
 
-                // If API returns no posts, assume we've reached the end.
-                if (data.posts.length === 0) {
-                    setHasMore(false);
-                } else {
-                    setPosts(prev => [...prev, ...data.posts]);
-                    // Trust the API's signal for the next page
-                    setHasMore(data.nextPage !== null);
-                }
-            } catch (error) {
-                console.error("Failed to fetch feed:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+				if (!response.ok) {
+					console.error("Failed to fetch feed: ", response.status, response.statusText);
+					setHasMore(false);
+					return;
+				}
+
+				const data = await response.json().catch(() => ({}));
+				const postsArray = Array.isArray(data?.posts) ? data.posts : [];
+
+				if (postsArray.length === 0) {
+					setHasMore(false);
+				} else {
+					setPosts(prev => [...prev, ...postsArray]);
+					const hasNext = data && Object.prototype.hasOwnProperty.call(data, "nextPage") ? data.nextPage !== null : postsArray.length > 0;
+					setHasMore(hasNext);
+				}
+			} catch (error) {
+				console.error("Failed to fetch feed:", error);
+			} finally {
+				setLoading(false);
+			}
+		};
 
         fetchPage();
     }, [page]); // The main trigger is the page number changing

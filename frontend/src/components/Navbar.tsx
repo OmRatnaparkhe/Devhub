@@ -40,12 +40,12 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center justify-center space-x-12">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
+                className={`text-md font-medium transition-colors hover:text-primary ${
                   isActive(item.href) ? "text-primary" : "text-muted-foreground"
                 }`}
               >
