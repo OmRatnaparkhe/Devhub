@@ -87,7 +87,7 @@ const Projects = () => {
   const fetchDashboardFeed = async () => {
     try {
       const token = await getToken();
-      const res = await fetch("http://localhost:3000/api/dashboard/feed", {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/dashboard/feed`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to fetch feed");
@@ -101,7 +101,7 @@ const Projects = () => {
     if (!userId) return;
     try {
       const token = await getToken();
-      const res = await fetch(`http://localhost:3000/api/projects/user/${userId}`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/projects/user/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to fetch user projects");
