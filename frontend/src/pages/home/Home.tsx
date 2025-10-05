@@ -7,13 +7,17 @@ import { useInView } from "react-intersection-observer";
 import { Sidebar } from "../../components/Sidebar"
 import { Card } from "@/components/ui/card";
 import FollowUsers from "../onboarding/FollowUsers";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 export const Home = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
     const { getToken } = useAuth()
     const { user } = useUser();
     const [posts, setPosts] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
+    
 
     // This useEffect handles ALL data fetching whenever 'page' changes
     useEffect(() => {
@@ -74,20 +78,30 @@ export const Home = () => {
         setPosts(prev => [newPost, ...prev]);
     };
 
+    const urlParams = new URLSearchParams(location.search);
+    const shouldCompose = urlParams.get("compose") === "1";
+
     return (
-  <div className="flex justify-center pt-20 px-4">
-    {/* LEFT SIDEBAR */}
-    <div className="hidden  lg:block w-[250px] pr-4 ">
-      <div className="sticky top-20">
+  <div className="flex flex-col lg:flex-row justify-center pt-20 px-4 pb-20">
+    {/* LEFT SIDEBAR (desktop) */}
+    <div className="hidden lg:block lg:w-[250px] lg:pr-4 lg:mb-0">
+      <div className="lg:sticky lg:top-20">
         <Sidebar />
       </div>
       
     </div>
 
     {/* CENTER FEED */}
-    <div className="w-full max-w-2xl">
-      {user && <CreatePost onPostCreated={handlePostCreated} />}
-      <div>
+    <div className="w-full max-w-2xl mx-auto lg:mx-0">
+      {user && <CreatePost onPostCreated={handlePostCreated} autoFocus={shouldCompose} />}
+      {/* SUGGESTED USERS (mobile-only) */}
+      <div className="lg:hidden">
+        <Card className="mt-4">
+          <div className="pt-4 pl-4 font-semibold">Suggested for you</div>
+          <FollowUsers context="widget" />
+        </Card>
+      </div>
+      <div className="mt-4">
         {posts.map(post => (
           <PostCard key={post.id} post={post} currentUserId={user?.id ?? ""} />
         ))}
@@ -110,9 +124,9 @@ export const Home = () => {
       )}
     </div>
 
-    {/* RIGHT SIDEBAR */}
-    <div className="hidden lg:block w-[300px] pl-4">
-      <div className="sticky top-20">
+    {/* RIGHT SIDEBAR (desktop suggestions) */}
+    <div className="hidden lg:block lg:w-[300px] lg:pl-4 lg:mt-0">
+      <div className="lg:sticky lg:top-20">
 
         <Card>
         <div className="pt-4 pl-4 font-semibold">Who to follow</div>
@@ -122,6 +136,7 @@ export const Home = () => {
 
       
     </div>
+    {/* Bottom nav moved to global App */}
   </div>
 );
 

@@ -16,7 +16,7 @@ export function SidebarComponent({name,logo,notificationCount}:SidebarComponentp
             <div>
                 {name}
             </div>
-            {notificationCount && notificationCount > 0 && (
+            {notificationCount && notificationCount > 1 && (
                 <div className="ml-auto flex items-center justify-center h-5 min-w-[20px] rounded-full bg-sky-500 px-1.5 text-xs text-white">
                     {notificationCount}
                 </div>

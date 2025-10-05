@@ -32,7 +32,7 @@ export function Sidebar() {
            />
         </PopoverTrigger>
         <PopoverContent className="w-80 p-0 border-gray-700 bg-black text-white" side="right">
-            <div className=" font-bold border-b border-gray-700">Notifications</div>
+            <div className="font-bold border-b border-gray-700 px-3 py-2">Notifications</div>
             <div className="max-h-96 overflow-y-auto scrollbar-hide">
                 {notifications.length > 0 ? (
                     notifications.map(notification => (
@@ -65,9 +65,9 @@ export function Sidebar() {
       </div>
   
       <div className="pt-2">
-        <button className=" w-full rounded-full bg-sky-500 hover:bg-sky-600 text-white py-2 font-semibold">
-        Post
-      </button>
+        <Link to="/homefeed?compose=1" className="block w-full">
+          <div className="w-full text-center rounded-full bg-sky-500 hover:bg-sky-600 text-white py-2 font-semibold">Post</div>
+        </Link>
       </div>
       
     </div>

@@ -21,13 +21,14 @@ type PostFormValues = z.infer<typeof postSchema>;
 
 interface CreatePostProps {
   onPostCreated: (newPost: any) => void;
-
+  autoFocus?: boolean;
 }
 
-export const CreatePost = ({ onPostCreated }: CreatePostProps) => {
+export const CreatePost = ({ onPostCreated, autoFocus = false }: CreatePostProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null); // preview state
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const form = useForm<PostFormValues>({ resolver: zodResolver(postSchema) });
   const { getToken } = useAuth();
 
@@ -63,6 +64,14 @@ export const CreatePost = ({ onPostCreated }: CreatePostProps) => {
     }
   };
 
+  // Focus and scroll into view when requested
+  if (autoFocus) {
+    setTimeout(() => {
+      textareaRef.current?.focus();
+      textareaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 0);
+  }
+
   return (
     <Card className="mb-6">
       <CardContent className="p-4 flex space-x-3">
@@ -72,6 +81,11 @@ export const CreatePost = ({ onPostCreated }: CreatePostProps) => {
             placeholder="What's happening?"
             className="resize-none border-none focus-visible:ring-0 text-lg"
             {...form.register("content")}
+            ref={(el) => {
+              // react-hook-form will also set its own ref
+              (form.register("content").ref as unknown as (instance: HTMLTextAreaElement | null) => void)?.(el);
+              textareaRef.current = el ?? null;
+            }}
           />
 
           {/* Image Preview Section */}

@@ -18,6 +18,8 @@ import OnBoarded from "./components/onBoardingCheck";
 import ConnectionsPage from "./pages/home/FollowersPage";
 import BookmarksPage from "./pages/BookmarksPage";
 import ProjectDetailPage from "./components/dashboard/ProjectDetail";
+import MobileBottomNav from "./components/MobileBottomNav";
+import NotificationsPage from "./pages/Notifications";
 
 // Lazy loaded heavy pages
 const Profile = lazy(() => import("./pages/home/newProfilepage"));
@@ -32,7 +34,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-background pb-16 lg:pb-0">
           <Navbar />
           <Routes>
             <Route path="/" element={
@@ -87,12 +89,14 @@ const App = () => (
                 <MessagesPage />
               </Suspense>
             } />
+            <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/blog" element={
               <ProtectedRoute><Blog /></ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <MobileBottomNav />
         </div>
       </BrowserRouter>
     </TooltipProvider>
