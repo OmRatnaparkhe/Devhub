@@ -92,16 +92,16 @@ export const Home = () => {
     </div>
 
     {/* CENTER FEED */}
-    <div className="w-full max-w-2xl mx-auto lg:mx-0">
+    <div className="w-[90%] mx-auto flex flex-col justify-center h-[100%]">
       {user && <CreatePost onPostCreated={handlePostCreated} autoFocus={shouldCompose} />}
       {/* SUGGESTED USERS (mobile-only) */}
       <div className="lg:hidden">
-        <Card className="mt-4">
+        <Card className="mt-1">
           <div className="pt-4 pl-4 font-semibold">Suggested for you</div>
           <FollowUsers context="widget" />
         </Card>
       </div>
-      <div className="mt-4">
+      <div >
         {posts.map(post => (
           <PostCard key={post.id} post={post} currentUserId={user?.id ?? ""} />
         ))}

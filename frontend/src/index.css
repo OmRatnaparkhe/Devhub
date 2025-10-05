@@ -123,4 +123,11 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Increase base font size on small screens for better readability */
+  @media (max-width: 640px) {
+    html {
+      font-size: 18px; /* default is 16px; this scales all rem-based sizes */
+    }
+  }
 }

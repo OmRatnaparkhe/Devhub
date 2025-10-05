@@ -13,30 +13,30 @@ export const MobileBottomNav = () => {
 
     return (
         <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-top border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t">
-            <div className="max-w-2xl mx-auto flex items-center justify-around py-2">
-                <Link to="/homefeed" className="relative p-3" aria-label="Home">
+            <div className="max-w-2xl mx-auto flex items-center justify-around py-3">
+                <Link to="/homefeed" className="relative p-4" aria-label="Home">
                     <HomeLogo />
                 </Link>
-                <Link to="/notifications" className="relative p-3" aria-label="Notifications">
+                <Link to="/notifications" className="relative p-4" aria-label="Notifications">
                     {unreadNotificationCount > 1 && (
-                        <span className="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center h-4 min-w-[16px] rounded-full bg-sky-500 px-1 text-[10px] text-white">
+                        <span className="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center h-5 min-w-[18px] rounded-full bg-sky-500 px-1.5 text-[11px] text-white">
                             {unreadNotificationCount}
                         </span>
                     )}
                     <NotificationLogo />
                 </Link>
-                <Link to="/messages" className="relative p-3" aria-label="Messages">
+                <Link to="/messages" className="relative p-4" aria-label="Messages">
                     {unreadMessageCount > 1 && (
-                        <span className="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center h-4 min-w-[16px] rounded-full bg-sky-500 px-1 text-[10px] text-white">
+                        <span className="absolute -top-0.5 -right-0.5 inline-flex items-center justify-center h-5 min-w-[18px] rounded-full bg-sky-500 px-1.5 text-[11px] text-white">
                             {unreadMessageCount}
                         </span>
                     )}
                     <MessagesLogo />
                 </Link>
-                <Link to="/bookmarks" className="relative p-3" aria-label="Bookmarks">
+                <Link to="/bookmarks" className="relative p-4" aria-label="Bookmarks">
                     <BookMarkLogo />
                 </Link>
-                <Link to={`/profile/${user?.id ?? ''}`} className="relative p-3" aria-label="Profile">
+                <Link to={`/profile/${user?.id ?? ''}`} className="relative p-4" aria-label="Profile">
                     <ProfileLogo />
                 </Link>
             </div>
