@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 import { useAuth, useUser } from '@clerk/clerk-react';
-import { Loader2, Send } from 'lucide-react';
+import { Loader2, Send, ArrowLeft } from 'lucide-react';
 import { Sidebar } from '../../components/Sidebar';
 import io, { type Socket } from 'socket.io-client';
 
@@ -41,7 +41,7 @@ interface Message {
 
 // --- ConversationsList Component (memoized, same layout) ---
 const ConversationsList = React.memo(({ users, onSelectUser, selectedUserId }: { users: ChatUser[], onSelectUser: (user: ChatUser) => void, selectedUserId: string | null }) => (
-    <div className="w-1/3 border-r border-gray-700 h-full overflow-y-auto scrollbar-hide">
+    <div className="w-full md:w-1/3 border-r border-gray-700 h-full overflow-y-auto scrollbar-hide">
         <div className="p-4 border-b border-gray-700">
             <h2 className="text-xl font-bold">Messages</h2>
         </div>
@@ -65,7 +65,7 @@ const ConversationsList = React.memo(({ users, onSelectUser, selectedUserId }: {
 ));
 
 // --- ChatWindow Component (No changes) ---
-const ChatWindow = React.memo(( { selectedUser, messages, onSendMessage, currentUserId }: { selectedUser: ChatUser, messages: Message[], onSendMessage: (content: string) => void, currentUserId: string }) => {
+const ChatWindow = React.memo(( { selectedUser, messages, onSendMessage, currentUserId, onBack }: { selectedUser: ChatUser, messages: Message[], onSendMessage: (content: string) => void, currentUserId: string, onBack?: () => void }) => {
     const [newMessage, setNewMessage] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -83,8 +83,13 @@ const ChatWindow = React.memo(( { selectedUser, messages, onSendMessage, current
     };
 
     return (
-        <div className="w-2/3 flex flex-col h-full">
+        <div className="w-full md:w-2/3 flex flex-col h-full">
             <div className="p-4 border-b border-gray-700 flex items-center space-x-4">
+                {onBack && (
+                    <button onClick={onBack} className="md:hidden mr-1 rounded-full p-2 hover:bg-gray-800" aria-label="Back">
+                        <ArrowLeft size={20} />
+                    </button>
+                )}
                 <img src={selectedUser.profilePic || 'https://placehold.co/40x40'} alt={selectedUser.name} className="w-10 h-10 rounded-full" />
                 <div>
                     <h3 className="text-lg font-bold">{selectedUser.name}</h3>
@@ -131,6 +136,7 @@ export const MessagesPage = () => {
     const socket = useRef<Socket | null>(null);
     const selectedUserRef = useRef<ChatUser | null>(null);
     const messagesRequestRef = useRef<AbortController | null>(null);
+    const [isMobile, setIsMobile] = useState<boolean>(false);
 
     // Keep a ref of the selected user to avoid re-subscribing socket on selection changes
     useEffect(() => {
@@ -167,6 +173,14 @@ export const MessagesPage = () => {
             };
         }
     }, [currentUser?.id]);
+
+    // Handle responsive layout detection
+    useEffect(() => {
+        const onResize = () => setIsMobile(window.innerWidth < 768);
+        onResize();
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
+    }, []);
 
     // --- Initial data fetch (no changes here, backend handles a lot) ---
     useEffect(() => {
@@ -274,14 +288,34 @@ export const MessagesPage = () => {
                     <Sidebar />
                 </div>
                 <div className="w-full max-w-4xl pt-20 pb-5 flex flex-col">
-                    <main className="flex-1 flex border border-gray-700 rounded-lg overflow-hidden h-[calc(100vh-100px)]">
-                        <ConversationsList users={conversations} onSelectUser={handleSelectUser} selectedUserId={selectedUser?.id || null} />
-                        {selectedUser && currentUser ? (
-                            <ChatWindow selectedUser={selectedUser} messages={messages} onSendMessage={handleSendMessage} currentUserId={currentUser.id} />
+                    <main className="flex-1 min-h-0 flex border border-gray-700 rounded-lg overflow-hidden">
+                        {isMobile ? (
+                            selectedUser && currentUser ? (
+                                <ChatWindow
+                                    selectedUser={selectedUser}
+                                    messages={messages}
+                                    onSendMessage={handleSendMessage}
+                                    currentUserId={currentUser.id}
+                                    onBack={() => setSelectedUser(null)}
+                                />
+                            ) : (
+                                <ConversationsList
+                                    users={conversations}
+                                    onSelectUser={handleSelectUser}
+                                    selectedUserId={selectedUser?.id || null}
+                                />
+                            )
                         ) : (
-                            <div className="w-2/3 flex items-center justify-center h-full bg-gray-900">
-                                <p className="text-gray-400">Select a conversation to start chatting.</p>
-                            </div>
+                            <>
+                                <ConversationsList users={conversations} onSelectUser={handleSelectUser} selectedUserId={selectedUser?.id || null} />
+                                {selectedUser && currentUser ? (
+                                    <ChatWindow selectedUser={selectedUser} messages={messages} onSendMessage={handleSendMessage} currentUserId={currentUser.id} />
+                                ) : (
+                                    <div className="w-2/3 flex items-center justify-center h-full bg-gray-900">
+                                        <p className="text-gray-400">Select a conversation to start chatting.</p>
+                                    </div>
+                                )}
+                            </>
                         )}
                     </main>
                 </div>

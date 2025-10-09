@@ -74,12 +74,12 @@ export const CreatePost = ({ onPostCreated, autoFocus = false }: CreatePostProps
 
   return (
     <Card className="mb-6">
-      <CardContent className="p-4 flex space-x-3">
+      <CardContent className="p-5 sm:p-4 flex space-x-3">
         
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 space-y-3">
           <Textarea
             placeholder="What's happening?"
-            className="resize-none border-none focus-visible:ring-0 text-lg"
+            className="resize-none border-none focus-visible:ring-0 text-xl sm:text-lg leading-relaxed min-h-[110px] sm:min-h-[90px]"
             {...form.register("content")}
             ref={(el) => {
               // react-hook-form will also set its own ref
@@ -94,7 +94,7 @@ export const CreatePost = ({ onPostCreated, autoFocus = false }: CreatePostProps
               <img
                 src={previewUrl}
                 alt="Preview"
-                className="max-h-[300px] rounded-lg border object-contain"
+                className="max-h-[340px] sm:max-h-[300px] rounded-lg border object-contain"
               />
               <button
                 type="button"
@@ -103,9 +103,9 @@ export const CreatePost = ({ onPostCreated, autoFocus = false }: CreatePostProps
                   form.setValue("image", undefined);
                   if (fileInputRef.current) fileInputRef.current.value = "";
                 }}
-                className="absolute top-2 right-2 bg-black/60 rounded-full p-1 text-white"
+                className="absolute top-2 right-2 bg-black/60 rounded-full p-1.5 sm:p-1 text-white"
               >
-                <X className="h-4 w-4" />
+                <X className="h-5 w-5 sm:h-4 sm:w-4" />
               </button>
             </div>
           )}
@@ -132,7 +132,7 @@ export const CreatePost = ({ onPostCreated, autoFocus = false }: CreatePostProps
                 size="icon"
                 onClick={() => fileInputRef.current?.click()}
               >
-                <ImagePlus className="h-5 w-5" />
+                <ImagePlus className="h-6 w-6 sm:h-5 sm:w-5" />
               </Button>
             </div>
 
@@ -140,9 +140,9 @@ export const CreatePost = ({ onPostCreated, autoFocus = false }: CreatePostProps
             <Button
               type="submit"
               disabled={isLoading}
-              className="rounded-full bg-sky-500 hover:bg-sky-600 text-white px-5"
+              className="rounded-full bg-sky-500 hover:bg-sky-600 text-white h-12 sm:h-10 px-6 sm:px-5 text-base sm:text-sm"
             >
-              {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isLoading && <Loader2 className="mr-2 h-5 w-5 sm:h-4 sm:w-4 animate-spin" />}
               Post
             </Button>
           </div>

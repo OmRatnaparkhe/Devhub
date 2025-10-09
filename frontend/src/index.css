@@ -124,10 +124,17 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 
-  /* Increase base font size on small screens for better readability */
+  /* Responsive mobile typography (more compact) */
   @media (max-width: 640px) {
-    html {
-      font-size: 18px; /* default is 16px; this scales all rem-based sizes */
-    }
+    html { font-size: clamp(15px, 3.5vw, 17px); }
+    body { line-height: 1.55; }
+
+    h1 { font-size: 1.5rem; }
+    h2 { font-size: 1.25rem; }
+    p, li { font-size: 1rem; }
+    small { font-size: 0.875rem; }
+
+    input, textarea, select { font-size: 1rem; }
+    button { font-size: 1rem; }
   }
 }

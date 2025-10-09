@@ -103,11 +103,11 @@ export const PostCard = React.memo(( { post, currentUserId }: PostCardProps) => 
   return (
     <Card className="mb-6 border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
       {/* Header */}
-      <CardHeader className="p-4 pb-2">
+      <CardHeader className="p-5 pb-3 sm:p-4 sm:pb-2">
         <div className="flex items-center justify-between">
           <div className="flex gap-3">
             <Link to={`/profile/${post?.author?.id}`}>
-              <Avatar className="h-10 w-10">
+              <Avatar className="h-10 w-10 sm:h-12 sm:w-12">
                 <AvatarImage src={post?.author?.profilePic} />
                 <AvatarFallback>{post?.author?.name[0]}</AvatarFallback>
               </Avatar>
@@ -115,11 +115,11 @@ export const PostCard = React.memo(( { post, currentUserId }: PostCardProps) => 
             <div className="flex flex-col">
               <Link
                 to={`/profile/${post?.author?.id}`}
-                className="font-semibold hover:underline"
+                className="font-semibold hover:underline text-base sm:text-lg"
               >
                 {post?.author?.name}
               </Link>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm sm:text-base text-muted-foreground">
                 @{post?.author?.username} ·{" "}
                 {new Date(post.createdAt).toLocaleDateString()}
               </span>
@@ -127,7 +127,7 @@ export const PostCard = React.memo(( { post, currentUserId }: PostCardProps) => 
           </div>
           <Button variant="ghost" size="icon" onClick={handleBookmarkToggle}>
             <Bookmark
-              className={`h-5 w-5 ${
+              className={`h-5 w-5 sm:h-6 sm:w-6 ${
                 isBookmarked ? "fill-current text-primary" : ""
               }`}
             />
@@ -136,9 +136,9 @@ export const PostCard = React.memo(( { post, currentUserId }: PostCardProps) => 
       </CardHeader>
 
       {/* Content */}
-      <CardContent className="px-4 pb-3">
+      <CardContent className="px-5 pb-4 sm:px-4 sm:pb-3">
         {post.content && (
-          <p className="whitespace-pre-wrap text-base leading-relaxed">
+          <p className="whitespace-pre-wrap break-words text-base sm:text-lg leading-relaxed">
             {post.content}
           </p>
         )}
@@ -147,31 +147,31 @@ export const PostCard = React.memo(( { post, currentUserId }: PostCardProps) => 
             <img
               src={post.imageUrl}
               alt="Post"
-              className="w-full max-h-[400px] object-contain rounded-lg border bg-black/5"
+              className="w-full max-h-[320px] sm:max-h-[420px] object-contain rounded-lg border bg-black/5"
             />
           </div>
         )}
       </CardContent>
 
       {/* Footer */}
-      <CardFooter className="p-4 pt-2 flex flex-col items-start gap-3 border-t">
+      <CardFooter className="p-5 pt-3 sm:p-4 sm:pt-2 flex flex-col items-start gap-3 border-t">
         {/* Actions */}
         <div className="flex items-center gap-6 text-muted-foreground">
           <button
-            className="flex items-center gap-1 hover:text-red-500 transition"
+            className="flex items-center gap-2 hover:text-red-500 transition"
             onClick={handleLike}
           >
             <Heart
-              className={`h-5 w-5 ${
+              className={`h-5 w-5 sm:h-6 sm:w-6 ${
                 isLiked ? "fill-red-500 text-red-500" : ""
               }`}
             />
-            <span className="text-sm">{likes?.length}</span>
+            <span className="text-sm sm:text-base">{likes?.length}</span>
           </button>
 
           <div className="flex items-center gap-1">
-            <MessageCircle className="h-5 w-5" />
-            <span className="text-sm">{comments?.length}</span>
+            <MessageCircle className="h-5 w-5 sm:h-6 sm:w-6" />
+            <span className="text-sm sm:text-base">{comments?.length}</span>
           </div>
         </div>
 
@@ -181,9 +181,9 @@ export const PostCard = React.memo(( { post, currentUserId }: PostCardProps) => 
             placeholder="Add a comment..."
             value={newComment}
             onChange={e => setNewComment(e.target.value)}
-            className="text-sm"
+            className="text-sm sm:text-base h-10 sm:h-12"
           />
-          <Button type="submit" size="sm">
+          <Button type="submit" className="h-10 px-4 sm:h-12 sm:px-5 text-sm sm:text-base">
             Reply
           </Button>
         </form>

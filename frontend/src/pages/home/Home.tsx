@@ -77,68 +77,63 @@ export const Home = () => {
     const handlePostCreated = (newPost: any) => {
         setPosts(prev => [newPost, ...prev]);
     };
-
     const urlParams = new URLSearchParams(location.search);
     const shouldCompose = urlParams.get("compose") === "1";
 
     return (
-  <div className="flex flex-col lg:flex-row justify-center pt-20 px-4 pb-20">
-    {/* LEFT SIDEBAR (desktop) */}
-    <div className="hidden lg:block lg:w-[250px] lg:pr-4 lg:mb-0">
-      <div className="lg:sticky lg:top-20">
-        <Sidebar />
-      </div>
-      
-    </div>
-
-    {/* CENTER FEED */}
-    <div className="w-[90%] mx-auto flex flex-col justify-center h-[100%]">
-      {user && <CreatePost onPostCreated={handlePostCreated} autoFocus={shouldCompose} />}
-      {/* SUGGESTED USERS (mobile-only) */}
-      <div className="lg:hidden">
-        <Card className="mt-1">
-          <div className="pt-4 pl-4 font-semibold">Suggested for you</div>
-          <FollowUsers context="widget" />
-        </Card>
-      </div>
-      <div >
-        {posts.map(post => (
-          <PostCard key={post.id} post={post} currentUserId={user?.id ?? ""} />
-        ))}
-      </div>
-
-      {hasMore && (
-        <div ref={ref} className="flex justify-center items-center h-20">
-          {loading && <Loader2 className="h-8 w-8 animate-spin" />}
+      <div className="flex flex-col lg:flex-row justify-center pt-20 lg:pt-20 px-3 pb-20">
+        {/* LEFT SIDEBAR (desktop) */}
+        <div className="hidden lg:block lg:w-[250px] lg:pr-2 lg:mb-0">
+          <div className="lg:sticky lg:ml-12 lg:top-20">
+            <Sidebar />
+          </div>
         </div>
-      )}
 
-      {!hasMore && posts.length > 0 && (
-        <p className="text-center text-muted-foreground my-8">You've reached the end! 🎉</p>
-      )}
+        {/* CENTER FEED */}
+        <div className="w-full max-w-screen-sm sm:max-w-2xl mx-auto flex flex-col justify-center h-full px-3 sm:px-0">
+          {user && (
+            <CreatePost onPostCreated={handlePostCreated} autoFocus={shouldCompose} />
+          )}
+          <div className="lg:hidden ">
+            <Card className="mt-0">
+              <div className="pt-3  pl-3 text-sm sm:text-base font-semibold">Suggested for you</div>
+              <FollowUsers context="widget" />
+            </Card>
+          </div>
+          <div className="flex flex-col mt-4 lg:mt-0">
+            {posts.map((post) => (
+              <PostCard key={post.id} post={post} currentUserId={user?.id ?? ""} />
+            ))}
+          </div>
+          {hasMore && (
+            <div ref={ref} className="flex justify-center items-center h-20">
+              {loading && <Loader2 className="h-8 w-8 animate-spin" />}
+            </div>
+          )}
+          {!hasMore && posts.length > 0 && (
+            <p className="text-center text-muted-foreground my-8">
+              You've reached the end! 🎉
+            </p>
+          )}
+          {posts.length === 0 && !loading && (
+            <p className="text-center text-muted-foreground my-8">
+              Your feed is empty. Follow some users to see their posts!
+            </p>
+          )}
+        </div>
 
-      {posts.length === 0 && !loading && (
-        <p className="text-center text-muted-foreground my-8">
-          Your feed is empty. Follow some users to see their posts!
-        </p>
-      )}
-    </div>
-
-    {/* RIGHT SIDEBAR (desktop suggestions) */}
-    <div className="hidden lg:block lg:w-[300px] lg:pl-4 lg:mt-0">
-      <div className="lg:sticky lg:top-20">
-
-        <Card>
-        <div className="pt-4 pl-4 font-semibold">Who to follow</div>
-        <FollowUsers context="widget" />
-      </Card>
+        {/* RIGHT SIDEBAR (desktop suggestions) */}
+        <div className="hidden lg:block lg:w-[300px] lg:mr-6  lg:mt-0">
+          <div className="lg:sticky lg:top-20">
+            <Card>
+              <div className="pt-4 pl-4 font-semibold">Who to follow</div>
+              <FollowUsers context="widget" />
+            </Card>
+          </div>
+        </div>
+        {/* Bottom nav moved to global App */}
       </div>
-
-      
-    </div>
-    {/* Bottom nav moved to global App */}
-  </div>
-);
+    );
 
 };
 

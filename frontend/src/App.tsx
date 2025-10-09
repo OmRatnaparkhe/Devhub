@@ -34,7 +34,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <div className="min-h-screen bg-background pb-16 lg:pb-0 text-[22px] md:text-base">
+        <div className="min-h-screen bg-background pb-16 lg:pb-0 text-base">
           <Navbar />
           <Routes>
             <Route path="/" element={

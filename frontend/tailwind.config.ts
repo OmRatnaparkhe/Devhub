@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import animate from "tailwindcss-animate";
 
 export default {
 	darkMode: ["class"],
@@ -6,9 +7,8 @@ export default {
 		"./pages/**/*.{ts,tsx}",
 		"./components/**/*.{ts,tsx}",
 		"./app/**/*.{ts,tsx}",
-		"./src/**/*.{ts,tsx}",
+		"./src/**/*.{ts,tsx}"
 	],
-	prefix: "",
 	theme: {
     	container: {
     		center: true,
@@ -56,11 +56,11 @@ export default {
     				DEFAULT: 'hsl(var(--sidebar-background))',
     				foreground: 'hsl(var(--sidebar-foreground))',
     				primary: 'hsl(var(--sidebar-primary))',
-    				'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-    				accent: 'hsl(var(--sidebar-accent))',
-    				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-    				border: 'hsl(var(--sidebar-border))',
-    				ring: 'hsl(var(--sidebar-ring))'
+					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+					accent: 'hsl(var(--sidebar-accent))',
+					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+					border: 'hsl(var(--sidebar-border))',
+					ring: 'hsl(var(--sidebar-ring))'
     			},
     			'dev-blue': 'hsl(var(--dev-blue))',
     			'dev-purple': 'hsl(var(--dev-purple))',
@@ -75,7 +75,6 @@ export default {
     		boxShadow: {
     			primary: 'var(--shadow-primary)',
     			card: 'var(--shadow-card)',
-    			glow: 'var(--shadow-glow)'
     		},
     		transitionTimingFunction: {
     			smooth: 'var(--transition-smooth)',
@@ -89,19 +88,19 @@ export default {
     		keyframes: {
     			'accordion-down': {
     				from: {
-    					height: '0'
-    				},
-    				to: {
-    					height: 'var(--radix-accordion-content-height)'
-    				}
+						height: '0'
+					},
+					to: {
+						height: 'var(--radix-accordion-content-height)'
+					}
     			},
     			'accordion-up': {
-    				from: {
-    					height: 'var(--radix-accordion-content-height)'
-    				},
-    				to: {
-    					height: '0'
-    				}
+					from: {
+						height: 'var(--radix-accordion-content-height)'
+					},
+					to: {
+						height: '0'
+					}
     			}
     		},
     		animation: {
@@ -110,5 +109,5 @@ export default {
     		}
     	}
     },
-	plugins: [require("tailwindcss-animate")],
+    plugins: [animate]
 } satisfies Config;
