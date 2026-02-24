@@ -48,7 +48,7 @@ router.post("/",requireAuth(),upload.single("image"),async (req:Request,res:Resp
 // Toggles a bookmark on a post
 router.post("/:id/bookmark", requireAuth(), async (req, res) => {
     try {
-        const postId = req.params.id;
+        const postId = req.params.id as string;
         const userId = req.auth?.userId;
 
         if (!userId) return res.status(401).json({ error: "Unauthorized" });
@@ -164,10 +164,10 @@ router.post("/:id/like",requireAuth(),async(req:Request,res:Response)=>{
             return;
         }
         const userId = auth.userId;
-        const postId = req.params.id;
+        const postId = req.params.id as string;
 
         const existing = await prisma.like.findFirst({
-            where:{postId,userId}
+            where:{postId:postId as string,userId}
         });
 
         if(existing){
@@ -184,14 +184,14 @@ router.post("/:id/like",requireAuth(),async(req:Request,res:Response)=>{
         else{
             await prisma.like.create({
                 data:{
-                    userId,postId
+                    userId,postId:postId as string
                 }
             })
 
             try{
                 const post = await prisma.post.findUnique({
                     where:{
-                        id:postId
+                        id:postId as string
                     },
                     select:{
                         authorId:true
@@ -204,7 +204,7 @@ router.post("/:id/like",requireAuth(),async(req:Request,res:Response)=>{
                             type:"LIKE",
                             userId:post.authorId,
                             actorId:userId,
-                            postId:postId
+                            postId:postId as string
                         }
                     })
                 }
@@ -231,7 +231,7 @@ router.post("/:id/comment",requireAuth(),async(req:Request,res:Response)=>{
             return;
         }
         const authorId = auth.userId;
-        const postId = req.params.id;
+        const postId = req.params.id as string;
         const {content} = req.body;
         if(!content?.trim()){
             res.status(400).json({message:"Comment cannot be empty!!"});
@@ -240,7 +240,7 @@ router.post("/:id/comment",requireAuth(),async(req:Request,res:Response)=>{
         const comment = await prisma.comment.create({
             data:{
                 content,
-                postId,
+                postId:postId as string,
                 authorId
             },
             include:{author:true}
@@ -263,7 +263,7 @@ router.post("/:id/comment",requireAuth(),async(req:Request,res:Response)=>{
                     type:"COMMENT",
                     userId:post.authorId,
                     actorId:authorId,
-                    postId:postId
+                    postId:postId as string
                 }
             })
            }

@@ -1,13 +1,14 @@
-// Messages.tsx - Updated with Notification Features
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-
 import { useAuth, useUser } from '@clerk/clerk-react';
-import { Loader2, Send, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Sidebar } from '../../components/Sidebar';
+import { Card } from '../../components/ui/card';
+import { Input } from '../../components/ui/input';
+import { Button } from '../../components/ui/button';
+import { Loader2, ArrowLeft, Send } from 'lucide-react';
 import io, { type Socket } from 'socket.io-client';
+import { backendUrl } from '@/config/api';
 
-// --- This style tag will hide the scrollbar ---
 const CustomStyles = () => (
   <style>{`
     .scrollbar-hide::-webkit-scrollbar {
@@ -20,13 +21,11 @@ const CustomStyles = () => (
   `}</style>
 );
 
-// --- Type definitions ---
 interface ChatUser {
     id: string;
     name: string;
     username: string;
     profilePic?: string;
-    // --- NEW ---: Property to track unread status for the UI indicator
     hasUnreadMessages?: boolean;
 }
 
@@ -39,7 +38,6 @@ interface Message {
     sender: ChatUser;
 }
 
-// --- ConversationsList Component (memoized, same layout) ---
 const ConversationsList = React.memo(({ users, onSelectUser, selectedUserId }: { users: ChatUser[], onSelectUser: (user: ChatUser) => void, selectedUserId: string | null }) => (
     <div className="w-full md:w-1/3 border-r border-gray-700 h-full overflow-y-auto scrollbar-hide">
         <div className="p-4 border-b border-gray-700">
@@ -47,13 +45,11 @@ const ConversationsList = React.memo(({ users, onSelectUser, selectedUserId }: {
         </div>
         <ul>
             {users.length > 0 ? users.map(user => (
-                // --- UPDATE ---: Added 'relative' positioning for the dot and adjusted padding/margin
                 <li key={user.id} onClick={() => onSelectUser(user)} className={`p-4 cursor-pointer hover:bg-gray-800 flex items-center space-x-3 relative ${selectedUserId === user.id ? 'bg-gray-800' : ''}`}>
-                    {/* --- NEW ---: Unread message indicator dot */}
                     {user.hasUnreadMessages && (
                         <div className="absolute left-2 top-1/2 transform -translate-y-1/2 w-2.5 h-2.5 bg-sky-500 rounded-full"></div>
                     )}
-                    <img src={user.profilePic || 'https://placehold.co/40x40'} alt={user.name} className="w-10 h-10 rounded-full ml-3" /> {/* Added margin for dot space */}
+                    <img src={user.profilePic || 'https://placehold.co/40x40'} alt={user.name} className="w-10 h-10 rounded-full ml-3" />
                     <div>
                         <p className={`font-semibold ${user.hasUnreadMessages ? 'text-white' : 'text-gray-200'}`}>{user.name}</p>
                         <p className="text-sm text-gray-400">@{user.username}</p>
@@ -64,7 +60,6 @@ const ConversationsList = React.memo(({ users, onSelectUser, selectedUserId }: {
     </div>
 ));
 
-// --- ChatWindow Component (No changes) ---
 const ChatWindow = React.memo(( { selectedUser, messages, onSendMessage, currentUserId, onBack }: { selectedUser: ChatUser, messages: Message[], onSendMessage: (content: string) => void, currentUserId: string, onBack?: () => void }) => {
     const [newMessage, setNewMessage] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -124,7 +119,6 @@ const ChatWindow = React.memo(( { selectedUser, messages, onSendMessage, current
     );
 });
 
-// --- MessagesPage Component (optimized, same layout) ---
 export const MessagesPage = () => {
     const { getToken } = useAuth();
     const { user: currentUser } = useUser();
@@ -138,15 +132,13 @@ export const MessagesPage = () => {
     const messagesRequestRef = useRef<AbortController | null>(null);
     const [isMobile, setIsMobile] = useState<boolean>(false);
 
-    // Keep a ref of the selected user to avoid re-subscribing socket on selection changes
     useEffect(() => {
         selectedUserRef.current = selectedUser;
     }, [selectedUser]);
 
-    // Socket listener initialized once per currentUser
     useEffect(() => {
         if (currentUser?.id ?? "") {
-            const socketInstance = io(`${import.meta.env.VITE_BACKEND_URL_PROD}`, {
+            const socketInstance = io(`${backendUrl}`, {
                 query: { userId: currentUser?.id ?? "" }
             });
             socket.current = socketInstance;
@@ -154,10 +146,8 @@ export const MessagesPage = () => {
             socketInstance.on('newMessage', (newMessage: Message) => {
                 const selected = selectedUserRef.current;
                 if (selected && newMessage.senderId === selected.id) {
-                    // Append to the current chat
                     setMessages(prevMessages => [...prevMessages, newMessage]);
                 } else if (newMessage.senderId !== currentUser.id) {
-                    // Mark unread in conversations
                     setConversations(prevConvos =>
                         prevConvos.map(convo =>
                             convo.id === newMessage.senderId
@@ -174,7 +164,6 @@ export const MessagesPage = () => {
         }
     }, [currentUser?.id]);
 
-    // Handle responsive layout detection
     useEffect(() => {
         const onResize = () => setIsMobile(window.innerWidth < 768);
         onResize();
@@ -182,14 +171,13 @@ export const MessagesPage = () => {
         return () => window.removeEventListener('resize', onResize);
     }, []);
 
-    // --- Initial data fetch (no changes here, backend handles a lot) ---
     useEffect(() => {
         const controller = new AbortController();
         const fetchConversations = async () => {
             try {
                 const token = await getToken();
                 if (!token) return;
-                const res = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/messages/conversations`, {
+                const res = await fetch(`${backendUrl}api/messages/conversations`, {
                     headers: { 'Authorization': `Bearer ${token}` },
                     signal: controller.signal,
                 });
@@ -208,12 +196,10 @@ export const MessagesPage = () => {
         return () => controller.abort();
     }, [getToken]);
 
-    // --- UPDATE ---: handleSelectUser enhanced to mark messages as read
     const handleSelectUser = useCallback(async (user: ChatUser) => {
         setSelectedUser(user);
         setMessages([]);
 
-        // Optimistically clear unread indicator
         if (user.hasUnreadMessages) {
             setConversations(prevConvos =>
                 prevConvos.map(convo =>
@@ -222,7 +208,6 @@ export const MessagesPage = () => {
             );
         }
 
-        // Cancel any in-flight messages request
         if (messagesRequestRef.current) {
             messagesRequestRef.current.abort();
         }
@@ -232,7 +217,7 @@ export const MessagesPage = () => {
         try {
             const token = await getToken();
             if (!token) return;
-            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/messages/conversations/${user.id}`, {
+            const res = await fetch(`${backendUrl}api/messages/conversations/${user.id}`, {
                 headers: { 'Authorization': `Bearer ${token}` },
                 signal: controller.signal,
             });
@@ -240,8 +225,7 @@ export const MessagesPage = () => {
             const data = await res.json();
             setMessages(data);
 
-            // Mark as read (no need to await if you want max snappiness)
-            fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/messages/mark-read`, {
+            fetch(`${backendUrl}api/messages/mark-read`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -262,7 +246,7 @@ export const MessagesPage = () => {
         if (!token) return;
 
         try {
-            await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/messages/send/${selectedUser.id}`, {
+            await fetch(`${backendUrl}api/messages/send/${selectedUser.id}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -270,7 +254,6 @@ export const MessagesPage = () => {
                 },
                 body: JSON.stringify({ content })
             });
-            // Message appears via socket listener
         } catch (error) {
             console.error('Failed to send message', error);
         }

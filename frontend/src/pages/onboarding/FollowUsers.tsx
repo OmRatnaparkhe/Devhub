@@ -1,12 +1,13 @@
 // File: FollowUsers.tsx
 
-import { useEffect, useState, useMemo } from "react"; // Re-add useRef if a state solution is too complex
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@clerk/clerk-react";
 import { UserListCard } from "@/components/UserListCard";
+import { backendUrl } from "@/config/api";
 
 // Define User type
 type User = {
@@ -38,7 +39,7 @@ export const FollowUsers = ({ context = 'page' }: FollowUsersProps) => {
         const initializeFollowStatus = async () => {
             const token = await getToken();
             try {
-                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/users/following`, {
+                const response = await fetch(`${backendUrl}api/users/following`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 if (!response.ok) {
@@ -67,7 +68,7 @@ export const FollowUsers = ({ context = 'page' }: FollowUsersProps) => {
         const limit = context === 'page' ? 10 : 5;
         try {
             const token = await getToken();
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/users/search?query=${encodeURIComponent(searchTerm)}&limit=${limit}`, {
+            const response = await fetch(`${backendUrl}api/users/search?query=${encodeURIComponent(searchTerm)}&limit=${limit}`, {
                 headers: { Authorization: token ? `Bearer ${token}` : "" }
             });
             if (!response.ok) {
@@ -97,7 +98,7 @@ export const FollowUsers = ({ context = 'page' }: FollowUsersProps) => {
         setFollowingStatus(prev => ({ ...prev, [userId]: !isCurrentlyFollowing }));
         try {
             const token = await getToken();
-            await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/users/${userId}/follow`, {
+            await fetch(`${backendUrl}api/users/${userId}/follow`, {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -184,7 +185,7 @@ export const FollowUsers = ({ context = 'page' }: FollowUsersProps) => {
                     </p>
                 </div>
                 <div>
-                    <Button className="mt-2" onClick={() => navigate('/')}>Finish & Go to Home</Button>
+                    <Button className="mt-2" onClick={() => navigate('/homefeed')}>Finish & Go to Home</Button>
                 </div>
                 </div>
                

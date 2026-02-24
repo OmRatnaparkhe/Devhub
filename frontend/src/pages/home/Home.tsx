@@ -8,6 +8,8 @@ import { Sidebar } from "../../components/Sidebar"
 import { Card } from "@/components/ui/card";
 import FollowUsers from "../onboarding/FollowUsers";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { backendUrl } from "@/config/api";
+
 export const Home = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -19,17 +21,15 @@ export const Home = () => {
     const [hasMore, setHasMore] = useState(true);
     
 
-    // This useEffect handles ALL data fetching whenever 'page' changes
+    
     useEffect(() => {
-        // This guard is crucial. It prevents fetching page 1 twice on mount,
-        // and stops if there are no more pages.
         if (!hasMore || (page === 1 && posts.length > 0)) return;
 
 		const fetchPage = async () => {
 			setLoading(true);
 			try {
 				const token = await getToken();
-				const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/posts/feed?page=${page}&limit=5`, {
+				const response = await fetch(`${backendUrl}api/posts/feed?page=${page}&limit=5`, {
 					method: "GET",
 					headers: {
 						Authorization: token ? `Bearer ${token}` : "",
@@ -60,14 +60,12 @@ export const Home = () => {
 		};
 
         fetchPage();
-    }, [page]); // The main trigger is the page number changing
+    }, [page]); 
 
-    // The 'ref' from useInView is now primarily for its `onChange` callback
+    
     const { ref } = useInView({
         threshold: 1.0,
-        // The onChange callback is the key to the fix
         onChange: (isInView) => {
-            // Fire only when the element IS in view and we are NOT loading/finished
             if (isInView && !loading && hasMore) {
                 setPage(prevPage => prevPage + 1);
             }
@@ -82,14 +80,13 @@ export const Home = () => {
 
     return (
       <div className="flex flex-col lg:flex-row justify-center pt-20 lg:pt-20 px-3 pb-20">
-        {/* LEFT SIDEBAR (desktop) */}
         <div className="hidden lg:block lg:w-[250px] lg:pr-2 lg:mb-0">
           <div className="lg:sticky lg:ml-12 lg:top-20">
             <Sidebar />
           </div>
         </div>
 
-        {/* CENTER FEED */}
+        
         <div className="w-full max-w-screen-sm sm:max-w-2xl mx-auto flex flex-col justify-center h-full px-3 sm:px-0">
           {user && (
             <CreatePost onPostCreated={handlePostCreated} autoFocus={shouldCompose} />
@@ -122,7 +119,6 @@ export const Home = () => {
           )}
         </div>
 
-        {/* RIGHT SIDEBAR (desktop suggestions) */}
         <div className="hidden lg:block lg:w-[300px] lg:mr-6  lg:mt-0">
           <div className="lg:sticky lg:top-20">
             <Card>
@@ -131,7 +127,6 @@ export const Home = () => {
             </Card>
           </div>
         </div>
-        {/* Bottom nav moved to global App */}
       </div>
     );
 

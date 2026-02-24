@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useAuth, useUser } from "@clerk/clerk-react";
+import { backendUrl } from "@/config/api";
 import { Loader2, ArrowLeft, Github, ExternalLink, MessageSquare, Trash2, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,8 +48,8 @@ const ProjectDetailPage = () => {
       try {
         const token = await getToken();
         const [projectRes, commentsRes] = await Promise.all([
-          fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/projects/${projectId}`, { headers: { Authorization: `Bearer ${token}` } }),
-          fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/projects/${projectId}/getComments`, { headers: { Authorization: `Bearer ${token}` } })
+          fetch(`${backendUrl}api/projects/${projectId}`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`${backendUrl}api/projects/${projectId}/getComments`, { headers: { Authorization: `Bearer ${token}` } })
         ]);
         if (!projectRes.ok) throw new Error("Failed to fetch project details");
         if (!commentsRes.ok) throw new Error("Failed to fetch comments");
@@ -69,7 +70,7 @@ const ProjectDetailPage = () => {
 
     try {
       const token = await getToken();
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/projects/${projectId}/comment`, {
+      const response = await fetch(`${backendUrl}api/projects/${projectId}/comment`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -93,7 +94,7 @@ const ProjectDetailPage = () => {
     setComments(prevComments => prevComments.filter(comment => comment.id !== commentId));
     try {
       const token = await getToken();
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/projects/comment/${commentId}`, {
+      const response = await fetch(`${backendUrl}api/projects/comment/${commentId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

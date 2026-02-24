@@ -32,11 +32,9 @@ export const uploadFileToCloudinary = async (
     return result.secure_url;
 
   } catch (error) {
-    // 3. If anything fails, log the error and re-throw it
     console.error("Error during file upload process:", error);
     throw new Error("Failed to upload file to Cloudinary.");
   } finally {
-    // 4. Cleanup ALL temporary files, regardless of success or failure
     try {
       if (tempOriginalPath) {
         await fs.unlink(tempOriginalPath); // Delete original multer file

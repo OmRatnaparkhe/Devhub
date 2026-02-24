@@ -23,19 +23,19 @@ export const prisma = new PrismaClient();
 const server = http.createServer(app)
 const io = new Server(server,{
  cors:{
-    origin:["http://localhost:5173", "https://devhub-ten-eta.vercel.app"], // frontend URL
+    origin:["http://localhost:5173", "https://devhub-ten-eta.vercel.app","http://localhost:5174"],
     credentials: true,
     methods: ["GET", "POST"]
   }
 })
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:5174",
   "https://devhub-ten-eta.vercel.app"
 ];
 
 app.use(cors({
   origin: function(origin, callback) {
-    // allow requests with no origin (like mobile apps or curl)
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
@@ -82,25 +82,23 @@ io.on("connection",(socket)=>{
 
 app.set("socketio",io)
 export {userSocketMap}
-// ✅ Use standard Clerk env keys (no VITE_ prefix on server)
-console.log("🔍 Environment check:", {
-  CLERK_PUBLISHABLE_KEY: process.env.CLERK_PUBLISHABLE_KEY ? "✅ SET" : "❌ MISSING",
-  CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY ? "✅ SET" : "❌ MISSING", 
-  DATABASE_URL: process.env.DATABASE_URL ? "✅ SET" : "❌ MISSING",
+console.log("Environment check:", {
+  CLERK_PUBLISHABLE_KEY: process.env.CLERK_PUBLISHABLE_KEY ? "SET" : "MISSING",
+  CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY ? "SET" : "MISSING", 
+  DATABASE_URL: process.env.DATABASE_URL ? "SET" : "MISSING",
   NODE_ENV: process.env.NODE_ENV || "not set"
 });
 
 const { CLERK_PUBLISHABLE_KEY, CLERK_SECRET_KEY } = process.env;
 
 if (!CLERK_PUBLISHABLE_KEY || !CLERK_SECRET_KEY) {
-  console.error("❌ Missing Clerk keys:", {
+  console.error("Missing Clerk keys:", {
     CLERK_PUBLISHABLE_KEY: !!CLERK_PUBLISHABLE_KEY,
     CLERK_SECRET_KEY: !!CLERK_SECRET_KEY
   });
-  throw new Error("❌ Missing Clerk keys in environment");
+  throw new Error("Missing Clerk keys in environment");
 }
 
-// ✅ Clerk middleware applied globally
 app.use(
   clerkMiddleware({
     publishableKey: CLERK_PUBLISHABLE_KEY,
@@ -108,7 +106,7 @@ app.use(
   })
 );
 
-// ✅ API routes
+
 app.use("/api/projects", ProjectRouter);
 app.use("/api/blogs", BlogsRouter);
 app.use("/api/posts", PostRouter);
@@ -118,39 +116,37 @@ app.use("/api/notifications",notificationRoutes)
 app.use("/api/dashboard",dashboardRoutes)
 // app.use("/api/webhooks", webhookRouter)
 
-// ✅ Debug test route
+
 app.get("/api/test", (req: Request, res: Response) => {
-  console.log("✅ /api/test route hit");
+  console.log("/api/test route hit");
   res.json({ ok: true });
 });
 
-// ✅ Global error handler (catch Clerk + other middleware errors)
 app.use(
   (err: any, req: Request, res: Response, next: NextFunction) => {
-    console.error("🔥 Middleware error:", err);
+    console.error("Middleware error:", err);
     res
       .status(err.statusCode || 500)
       .json({ error: err.message || "Internal server error" });
   }
 );
 
-// ✅ Add startup error handling
 process.on('uncaughtException', (error) => {
-  console.error('🚨 Uncaught Exception:', error);
+  console.error('Uncaught Exception:', error);
   process.exit(1);
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('🚨 Unhandled Rejection at:', promise, 'reason:', reason);
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
   process.exit(1);
 });
 
 try {
   const PORT = process.env.PORT || 3000;
   server.listen(PORT, () => {
-    console.log(`🚀 Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
   });
 } catch (error) {
-  console.error('🚨 Server startup error:', error);
+  console.error('Server startup error:', error);
   process.exit(1);
 }

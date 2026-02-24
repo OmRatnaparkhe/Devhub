@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth, useUser } from "@clerk/clerk-react";
+import { backendUrl } from "@/config/api";
 import { Sidebar } from "@/components/Sidebar";
 import { PostCard } from "@/components/PostCard";
 import { Loader2 } from "lucide-react";
@@ -18,7 +19,7 @@ export const BookmarksPage = () => {
             setLoading(true);
             try {
                 const token = await getToken();
-                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/posts/bookmarks`, {
+                const response = await fetch(`${backendUrl}api/posts/bookmarks`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const data = await response.json();

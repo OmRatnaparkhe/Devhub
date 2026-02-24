@@ -5,7 +5,6 @@ import { prisma } from "../server";
 const router = Router();
 router.use(requireAuth())
 
-//Fetch all users(following+follower)
 router.get("/conversations",async(req,res)=>{
     try{
         const currentUserId = req.auth?.userId;

@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuth } from "@clerk/clerk-react";
+import { backendUrl } from "@/config/api";
 
 const ProjectInputModal = ({ isOpen, onClose, onSubmit }) => {
   // existing fields (unchanged)
@@ -55,7 +56,7 @@ const ProjectInputModal = ({ isOpen, onClose, onSubmit }) => {
       .forEach(t => formData.append("technologies", t));
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/projects/create`, {
+      const res = await fetch(`${backendUrl}api/projects/create`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
         body: formData,

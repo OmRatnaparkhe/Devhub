@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Github, ExternalLink, Code2, Loader2, Search } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 import { useAuth } from "@clerk/clerk-react";
+import { backendUrl } from "@/config/api";
 import ProjectInputModal from "@/components/ProjectInputModal";
 import { Input } from "../ui/input";
 import { Link } from "react-router-dom";
@@ -87,7 +88,7 @@ const Projects = () => {
   const fetchDashboardFeed = async () => {
     try {
       const token = await getToken();
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/dashboard/feed`, {
+      const res = await fetch(`${backendUrl}api/dashboard/feed`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to fetch feed");
@@ -101,7 +102,7 @@ const Projects = () => {
     if (!userId) return;
     try {
       const token = await getToken();
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/projects/user/${userId}`, {
+      const res = await fetch(`${backendUrl}api/projects/user/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to fetch user projects");

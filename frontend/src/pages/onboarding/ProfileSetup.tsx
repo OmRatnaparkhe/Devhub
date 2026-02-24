@@ -2,7 +2,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth, useUser } from "@clerk/clerk-react";
+import { backendUrl } from "@/config/api";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -26,7 +28,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useAuth } from "@clerk/clerk-react";
 import { useToast } from "@/hooks/use-toast";
 
 const techRoles = [
@@ -93,7 +94,7 @@ async function onSubmit(data: ProfileFormValues) {
         
         const token = await getToken();
         
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/users/profile`, {
+        const response = await fetch(`${backendUrl}api/users/profile`, {
             method: "POST",
             headers: {
                 Authorization: `Bearer ${token}`,

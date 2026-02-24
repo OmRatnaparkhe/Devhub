@@ -7,6 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, ImagePlus, X } from "lucide-react";
 import { useAuth } from "@clerk/clerk-react";
+import { useToast } from "@/hooks/use-toast";
+import { backendUrl } from "@/config/api";
 
 const postSchema = z.object({
   content: z
@@ -42,7 +44,7 @@ export const CreatePost = ({ onPostCreated, autoFocus = false }: CreatePostProps
 
     try {
       const token = await getToken();
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/posts`, {
+      const response = await fetch(`${backendUrl}api/posts`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

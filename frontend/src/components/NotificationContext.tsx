@@ -1,6 +1,7 @@
 import  { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 // Make sure to install clerk-react if not already present: npm install @clerk/clerk-react
-import { useAuth } from '@clerk/clerk-react';
+import { useAuth } from "@clerk/clerk-react";
+import { backendUrl } from "@/config/api";
 // Make sure to install socket.io-client if not already present: npm install socket.io-client
 import io from 'socket.io-client';
 
@@ -58,7 +59,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
         try {
             // Fetch all notifications; filtering happens on the client side here.
             // Alternatively, create separate backend endpoints for counts for efficiency.
-            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/notifications`, {
+            const res = await fetch(`${backendUrl}api/notifications`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -107,7 +108,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
         if (!userId) return;
 
         // Establish connection, passing userId for authentication/room joining on backend
-        const socket = io(`${import.meta.env.VITE_BACKEND_URL_PROD}`, { query: { userId } });
+        const socket = io(`${backendUrl}`, { query: { userId } });
 
         // Listen for all new notification events (like, comment, follow, message)
         socket.on('new_notification', (newNotification: Notification) => {
@@ -144,7 +145,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
         setNotifications(prevList => prevList.map(n => ({ ...n, read: true })));
 
         try {
-            await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/notifications/mark-read`, {
+            await fetch(`${backendUrl}api/notifications/mark-read`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });

@@ -96,24 +96,24 @@ router.post("/profile", upload.fields([{ name: "profilePic", maxCount: 1 }]), re
       console.log("  profilePicUrl:", profilePicUrl);
 
 
-      // const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-      // if (files?.profilePic && files.profilePic[0]) {
-      //   try {
-      //     profilePicUrl = await uploadFileToCloudinary(
-      //       files.profilePic[0],
-      //       "profile-image",
-      //       { width: 300, height: 300 }
-      //     );
-      //   } catch (uploadError) {
-      //     console.error(
-      //       "Error uploading profile picture to Cloudinary:",
-      //       uploadError
-      //     );
-      //     return res
-      //       .status(500)
-      //       .json({ error: "Failed to upload profile picture." });
-      //   }
-      // }
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      if (files?.profilePic && files.profilePic[0]) {
+        try {
+          profilePicUrl = await uploadFileToCloudinary(
+            files.profilePic[0],
+            "profile-image",
+            { width: 300, height: 300 }
+          );
+        } catch (uploadError) {
+          console.error(
+            "Error uploading profile picture to Cloudinary:",
+            uploadError
+          );
+          return res
+            .status(500)
+            .json({ error: "Failed to upload profile picture." });
+        }
+      }
 
 
       // console.log("👉 Running prisma.upsert");
@@ -127,7 +127,7 @@ router.post("/profile", upload.fields([{ name: "profilePic", maxCount: 1 }]), re
           githubLink: githubLink ? { set: githubLink } : undefined,
           role: role || "",
           onboarded: true,
-          // profilePic: profilePicUrl ? { set: profilePicUrl } : undefined,
+          profilePic: profilePicUrl ? { set: profilePicUrl } : undefined,
         },
         create: {
           id: userId,
@@ -138,7 +138,7 @@ router.post("/profile", upload.fields([{ name: "profilePic", maxCount: 1 }]), re
           githubLink: githubLink || null,
           role: role || "",
           onboarded: true,
-          // profilePic: profilePicUrl,
+          profilePic: profilePicUrl,
         },
       });
 
@@ -157,7 +157,7 @@ router.post("/profile", upload.fields([{ name: "profilePic", maxCount: 1 }]), re
 
 router.get("/:id/profile", requireAuth(), async (req: Request, res: Response) => {
   try {
-    const userId = req.params.id;
+    const userId = req.params.id as string;
 
     // Decide whether to fetch full profile or just onboarding status
     const fetchFullProfile = req.query.full === 'true';
@@ -218,7 +218,7 @@ router.post("/:id/follow", requireAuth(), async (req: Request, res: Response) =>
       return;
     }
     const currentUserId = auth.userId;
-    const targettedUserId = req.params.id;
+    const targettedUserId = req.params.id as string;
 
     if (currentUserId === targettedUserId) {
       console.error("Cannot follow yourself!!")
@@ -242,7 +242,7 @@ router.post("/:id/follow", requireAuth(), async (req: Request, res: Response) =>
       await prisma.follows.create({
         data: {
           followerId: currentUserId,
-          followingId: targettedUserId
+          followingId: targettedUserId as string
         }
       })
 
@@ -252,7 +252,7 @@ router.post("/:id/follow", requireAuth(), async (req: Request, res: Response) =>
         await prisma.notification.create({
           data:{
             type:"FOLLOW",
-            userId:targettedUserId,
+            userId:targettedUserId as string,
             actorId:currentUserId
           }
         })
@@ -297,7 +297,7 @@ router.put("/:id/update", upload.single("profilePic"), requireAuth(), async (req
 
   try {
     const updatedUser = await prisma.user.update({
-      where: { id },
+      where: { id: id as string },
       data: {
         name,
         username,

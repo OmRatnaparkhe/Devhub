@@ -12,8 +12,8 @@ import { Button } from "@/components/ui/button";
 import FollowUsers from "../onboarding/FollowUsers";
 import { PostCard } from "@/components/PostCard";
 import React from "react";
+import { backendUrl } from "@/config/api";
 
-// --- TYPE DEFINITIONS ---
 interface Technology { id: string; name: string; }
 interface Post {
   id: string;
@@ -33,8 +33,6 @@ interface Post {
 interface Project { id: string; title: string; description: string; thumbnail: string; githubUrl: string; liveUrl?: string; technologies: Technology[]; }
 interface Blog { id: string; title: string; description: string; blogThumbnail: string; publishedAt: string; technologies: Technology[]; }
 interface UserProfile { id: string; name: string; username: string; profilePic?: string; githubLink: string; description?: string; role: string; posts: Post[]; projects: Project[]; blogs: Blog[]; followers?: any[]; following?: any[]; }
-
-// --- CARDS ---
 
 
 const ProjectCard = React.memo(({ project }: { project: Project }) => (
@@ -75,7 +73,6 @@ const BlogCard = React.memo(({ blog }: { blog: Blog }) => (
   </div>
 ));
 
-// --- MAIN PROFILE PAGE ---
 export const Profile = () => {
   const { userId } = useParams<{ userId: string }>();
   const { getToken } = useAuth();
@@ -94,7 +91,6 @@ export const Profile = () => {
     profilePic: ""
   });
 
-  // Sync formData with profile once loaded
   useEffect(() => {
     if (profile) {
       setFormData({
@@ -124,12 +120,12 @@ export const Profile = () => {
       body.append("role", formData.role);
 
       if (formData.profilePic instanceof File) {
-        body.append("profilePic", formData.profilePic); // ✅ upload new file
+        body.append("profilePic", formData.profilePic); 
       } else {
         body.append("profilePic", formData.profilePic || "");
       }
 
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/users/${profile?.id}/update`, {
+      const res = await fetch(`${backendUrl}api/users/${profile?.id}/update`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`
@@ -156,7 +152,7 @@ export const Profile = () => {
     queryFn: async () => {
       const token = await getToken();
       if (!token || !userId) return null;
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/users/${userId}/profile?full=true`, {
+      const response = await fetch(`${backendUrl}api/users/${userId}/profile?full=true`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (!response.ok) throw new Error("Failed to fetch profile");
@@ -169,13 +165,11 @@ export const Profile = () => {
     placeholderData: (prev) => prev as any,
   });
 
-  // Sync local state for edit form convenience
   useEffect(() => {
     if (queriedProfile) setProfile(queriedProfile);
   }, [queriedProfile]);
   
   
-      // This useEffect handles ALL data fetching whenever 'page' changes
      
 
   if (isLoading) return <div className="flex justify-center items-center h-screen"><Loader2 className="h-12 w-12 animate-spin text-sky-500" /></div>;
@@ -185,14 +179,11 @@ export const Profile = () => {
 
   return (
     <div className="flex justify-center pt-20 px-4">
-      {/* LEFT SIDEBAR */}
       <div className="hidden lg:block w-[250px] pr-4">
         <Sidebar />
       </div>
 
-      {/* CENTER CONTENT */}
       <div className="w-full max-w-2xl">
-        {/* Header */}
         <div className="bg-black dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
           <div className="flex items-center space-x-4">
             <img
@@ -231,7 +222,6 @@ export const Profile = () => {
             )}
           </div>
 
-          {/* Edit Modal */}
           <Dialog open={editOpen} onOpenChange={setEditOpen}>
             <DialogContent>
               <DialogHeader>
@@ -243,7 +233,6 @@ export const Profile = () => {
                 <Input name="role" value={formData.role} onChange={handleChange} placeholder="Role" />
                 <Input  name="githubLink" value={formData.githubLink} onChange={handleChange} placeholder="GitHub Link" />
 
-                {/* File upload */}
                 <div>
                   <label className="block text-sm font-medium mb-1">Profile Image</label>
                   <input
@@ -256,7 +245,6 @@ export const Profile = () => {
                       }
                     }}
                   />
-                  {/* Preview */}
                   {formData.profilePic instanceof File ? (
                     <img
                       src={URL.createObjectURL(formData.profilePic)}
@@ -283,8 +271,6 @@ export const Profile = () => {
             </DialogContent>
           </Dialog>
         </div>
-
-        {/* Tabs */}
         <div className="flex justify-center bg-black dark:bg-gray-800 rounded-lg shadow p-2 space-x-2 mb-6">
           <button
             onClick={() => setActiveTab("posts")}
@@ -306,7 +292,6 @@ export const Profile = () => {
           </button>
         </div>
 
-        {/* Tab Content */}
         {activeTab === "posts" && (
           profile.posts.length > 0
             ? profile.posts.map(p => <PostCard key={p.id} post={p} currentUserId={user?.id ?? ""} />)
@@ -328,7 +313,6 @@ export const Profile = () => {
         )}
       </div>
 
-      {/* RIGHT SIDEBAR */}
       <div className="hidden lg:block w-[300px] pl-4">
 
         <Card>
