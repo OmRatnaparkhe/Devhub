@@ -54,7 +54,7 @@ router.post("/create",requireAuth(),upload.single("blog"),async(req:Request,res:
 //For fetching all blogs by certain user
 router.get("/user/:id",requireAuth(),async(req:Request,res:Response)=>{
     try{
-        const userId = req.params.id;
+        const userId = req.params.id as string;
 
         if(!userId){
             res.json({error:"User is not authorized!!"});
@@ -63,7 +63,7 @@ router.get("/user/:id",requireAuth(),async(req:Request,res:Response)=>{
 
         const blogs = await prisma.blog.findMany({
             where:{
-                id:userId
+                userId:userId
             },
             include:{
                 technologies:true,
@@ -83,14 +83,14 @@ router.get("/user/:id",requireAuth(),async(req:Request,res:Response)=>{
 //For fetching particular blog by user
 router.get("/:id",requireAuth(),async(req:Request,res:Response)=>{
     try{
-        const blogId = req.params.id;
+        const blogId = req.params.id as string;
         if(!blogId){
             res.json({error:"Blog is not present!!"});
             return;
         } 
         const blog = await prisma.blog.findUnique({
             where:{
-                id:blogId
+                id:blogId as string
             },
             include:{
                 technologies:true,
@@ -109,7 +109,7 @@ router.get("/:id",requireAuth(),async(req:Request,res:Response)=>{
 router.put("/:id",requireAuth(),async(req:Request,res:Response)=>{
     try{
         const auth = req.auth ;
-        const blogId = req.params.id;
+        const blogId = req.params.id as string;
          if (!auth || !auth.userId) {
             res.json({error:"UserId is not present!!"});
             return;
@@ -119,7 +119,7 @@ router.put("/:id",requireAuth(),async(req:Request,res:Response)=>{
 
         const blog = await prisma.blog.findUnique({
             where:{
-                id:blogId
+                id:blogId as string
             }
         });
         if(!blog){
@@ -134,7 +134,7 @@ router.put("/:id",requireAuth(),async(req:Request,res:Response)=>{
 
         const updated = await prisma.blog.update({
             where:{
-                id:blogId
+                id:blogId as string
             },
             data:{
                 title,
@@ -156,7 +156,7 @@ router.put("/:id",requireAuth(),async(req:Request,res:Response)=>{
 //For deleting a blog
 router.delete("/:id",requireAuth(),async(req:Request,res:Response)=>{
     try{
-        const blogId = req.params.id;
+        const blogId = req.params.id as string;
         const auth = req.auth ;
          if (!auth || !auth.userId) {
             res.json({error:"UserId is not present!!"});
@@ -166,7 +166,7 @@ router.delete("/:id",requireAuth(),async(req:Request,res:Response)=>{
 
         const blog = await prisma.blog.findUnique({
             where:{
-                id:blogId
+                id:blogId as string
             },
             include:{
                 user:true,
@@ -183,7 +183,7 @@ router.delete("/:id",requireAuth(),async(req:Request,res:Response)=>{
 
         await prisma.blog.delete({
             where:{
-                id:blogId
+                id:blogId as string
             }
         });
         res.json({message:"Blog deleted successfully!!"})

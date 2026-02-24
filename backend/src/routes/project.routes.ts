@@ -38,7 +38,7 @@ router.post("/create",upload.single("thumbnail"),requireAuth(),async(req:Request
                 githubUrl,
                 thumbnail:thumbnailUrl,
                 liveUrl,
-                userId,
+                userId:userId,
                 technologies:{
                     connectOrCreate:technologies.map((tech:string)=>({
                          where: { name: tech },   // must match a unique field
@@ -61,14 +61,14 @@ router.post("/create",upload.single("thumbnail"),requireAuth(),async(req:Request
 //For fetching all projects by user
 router.get("/user/:id",requireAuth(),async(req:Request,res:Response)=>{
     try{
-        const userId = req.params.id;
+        const userId = req.params.id as string;
         if(!userId){
             res.json({message:"UserId not found"})
             return;
         }
         const projects = await prisma.project.findMany({
             where:{
-                userId
+                userId:userId
             },
             include:{
                 technologies:true,
@@ -95,7 +95,7 @@ router.get("/user/:id",requireAuth(),async(req:Request,res:Response)=>{
 //For fetching single project by projectId
 router.get("/:id", requireAuth(), async (req: Request, res: Response) => {
     try {
-        const projectId = req.params.id;
+        const projectId = req.params.id as string;
 
         const project = await prisma.project.findUnique({
             where: {
@@ -136,13 +136,13 @@ router.put("/:id",requireAuth(),async(req:Request,res:Response)=>{
             res.json({error:"UserId is not present!!"});
             return;
         }
-        const projectId = req.params.id;
+        const projectId = req.params.id as string;
         const userId = auth.userId;
         const {title, description, thumbnail,githubUrl,liveUrl, technologies} = req.body;
 
         const project = await prisma.project.findUnique({
             where:{
-                id:projectId
+                id:projectId as string
             }
         });
         if(!project){
@@ -157,7 +157,7 @@ router.put("/:id",requireAuth(),async(req:Request,res:Response)=>{
 
         const updated = await prisma.project.update({
             where:{
-                id:projectId
+                id:projectId as string
             },
             data:{
                 title,
@@ -201,7 +201,7 @@ router.post("/:projectId/comment", requireAuth(), async (req: Request, res: Resp
         const newComment = await prisma.comment.create({
             data: {
                 content: content,
-                projectId: projectId, // Link to the project
+                projectId: projectId as string, // Link to the project
                 authorId: userId ,
                 postId: null    // Link to the user (author)
             },
@@ -238,6 +238,7 @@ router.get("/:projectId/getComments", requireAuth(), async (req: Request, res: R
         }
 
         const { projectId } = req.params;
+        const projectIdStr = projectId as string;
         
         // This check is mostly redundant if your routing is correct, but it's okay to have.
         if (!projectId) {
@@ -247,7 +248,7 @@ router.get("/:projectId/getComments", requireAuth(), async (req: Request, res: R
         // Renamed variable for clarity
         const comments = await prisma.comment.findMany({
             where: {
-                projectId: projectId
+                projectId: projectIdStr
             },
             include: {
                 // Be specific about what author data you need
@@ -290,7 +291,7 @@ router.delete("/comment/:commentId", requireAuth(), async (req: Request, res: Re
 
         // First, find the comment to ensure it exists and to check the author
         const comment = await prisma.comment.findUnique({
-            where: { id: commentId },
+            where: { id: commentId as string },
         });
 
         if (!comment) {
@@ -304,7 +305,7 @@ router.delete("/comment/:commentId", requireAuth(), async (req: Request, res: Re
 
         // If all checks pass, delete the comment
         await prisma.comment.delete({
-            where: { id: commentId },
+            where: { id: commentId as string },
         });
 
         res.status(200).json({ message: "Comment deleted successfully." });
@@ -323,11 +324,11 @@ router.delete("/:id",requireAuth(),async(req:Request,res:Response)=>{
             return;
         }
         const userId = auth.userId;
-        const projectId = req.params.id;
+        const projectId = req.params.id as string;
 
         const project = await prisma.project.findUnique({
             where:{
-                id:projectId
+                id:projectId as string
             }
         })
 
@@ -342,7 +343,7 @@ router.delete("/:id",requireAuth(),async(req:Request,res:Response)=>{
 
         await prisma.project.delete({
             where:{
-                id:projectId
+                id:projectId as string
             },
         });
         res.json({message:"Project deleted successfully!"})
