@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Bookmark, Heart, MessageCircle } from "lucide-react";
 import { useAuth } from "@clerk/clerk-react";
+import { backendUrl } from "@/config/api";
 
 type Post = {
   id: string;
@@ -49,7 +50,7 @@ export const PostCard = React.memo(( { post, currentUserId }: PostCardProps) => 
 
     try {
       const token = await getToken();
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/posts/${post.id}/like`, {
+      const response = await fetch(`${backendUrl}api/posts/${post.id}/like`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -64,7 +65,7 @@ export const PostCard = React.memo(( { post, currentUserId }: PostCardProps) => 
     setIsBookmarked(prev => !prev);
     try {
       const token = await getToken();
-      await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/posts/${post.id}/bookmark`, {
+      await fetch(`${backendUrl}api/posts/${post.id}/bookmark`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -80,7 +81,7 @@ export const PostCard = React.memo(( { post, currentUserId }: PostCardProps) => 
 
     try {
       const token = await getToken();
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL_PROD}api/posts/${post.id}/comment`, {
+      const response = await fetch(`${backendUrl}api/posts/${post.id}/comment`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
