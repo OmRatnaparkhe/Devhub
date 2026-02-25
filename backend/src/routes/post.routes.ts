@@ -121,12 +121,25 @@ router.get("/feed",requireAuth(),async(req:Request,res:Response)=>{
         const page = parseInt((req.query.page as string) || "1",10);
         const limit = parseInt((req.query.limit as string) || "5",10);
 
+        // Debug: Check if user has any follows
+        const userFollows = await prisma.follows.findMany({
+            where: { followerId: userId },
+            include: { following: true }
+        });
+        console.log("User follows:", userFollows.map(f => ({followingId: f.followingId, followingName: f.following.name})));
+
+        // Debug: Check user's own posts
+        const userOwnPosts = await prisma.post.findMany({
+            where: { authorId: userId }
+        });
+        console.log("User's own posts:", userOwnPosts.length);
+
         const posts = await prisma.post.findMany({
             where:{
                 OR:[
                     { authorId: userId },
-                    // Authors whose followers include the current user
-                    { author: { followers: { some: { followerId: userId } } } }
+                    // Authors that the current user follows
+                    { author: { following: { some: { followerId: userId } } } }
                 ],
             },
             include : {
@@ -143,6 +156,9 @@ router.get("/feed",requireAuth(),async(req:Request,res:Response)=>{
             skip:(page-1)*limit,
             take:limit
         })
+        console.log("Feed query for user:", userId);
+        console.log("Posts found:", posts.length);
+        console.log("Post authors:", posts.map(p => ({authorId: p.authorId, authorName: p.author.name})));
         res.json({
             posts,
             nextPage:posts.length === limit ? page + 1:null

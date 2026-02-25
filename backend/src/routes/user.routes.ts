@@ -220,6 +220,8 @@ router.post("/:id/follow", requireAuth(), async (req: Request, res: Response) =>
     const currentUserId = auth.userId;
     const targettedUserId = req.params.id as string;
 
+    console.log("Follow attempt:", { currentUserId, targettedUserId });
+
     if (currentUserId === targettedUserId) {
       console.error("Cannot follow yourself!!")
     }
@@ -230,12 +232,15 @@ router.post("/:id/follow", requireAuth(), async (req: Request, res: Response) =>
       }
     })
 
+    console.log("Existing follow:", existing);
+
     if (existing) {
       await prisma.follows.delete({
         where: {
           id: existing.id
         }
       })
+      console.log("Unfollowed successfully");
       res.json({ following: false })
     }
     else {
@@ -246,6 +251,7 @@ router.post("/:id/follow", requireAuth(), async (req: Request, res: Response) =>
         }
       })
 
+      console.log("Followed successfully");
       //Notification logic
       if(currentUserId!==targettedUserId){
         try{
